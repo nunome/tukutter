@@ -10,4 +10,4 @@ def helloworld():
 def mypagepage():
     return 'nice to meet you!'
 
-print('--- This is test line ---')
+# print('--- This is test line ---')
