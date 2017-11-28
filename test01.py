@@ -9,4 +9,5 @@ def helloworld():
 @app.route('/mypage')
 def mypagepage():
     return 'nice to meet you!'
-        
+
+print('--- This is test line ---')
