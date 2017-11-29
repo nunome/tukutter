@@ -22,8 +22,7 @@ def signup():
     
     # Check password.
     if request.form['password'] != request.form['conf_password']:
-
-        return redirect( url + '/static/login.html' )
+        return 'パスワードが一致していません。'
 
     # Connect to database.
     db = MySQLdb.connect( user='root', passwd='YutaOkinawa1211', host='localhost', db='tukutter', charset='utf8')
@@ -42,15 +41,55 @@ def signup():
     # [Need to change] Jump to top menu. 
     return redirect( url + '/static/login.html' )
 
+# Show top menu.
 @application.route('/top', methods=['POST'])
 def top():
 
-    # Show top menu.
-
+    url = 'http://localhost:8080'
+    
     # Find login user.
-    
-    login_id = request.form['login_id']
-    password = request.form['password']
-    
-    
 
+    # Get login user's value from web form.
+    login_id = request.form['login_id']
+    in_pass = request.form['password']
+    
+    # Connect to database.
+    db = MySQLdb.connect( user='root', passwd='YutaOkinawa1211', host='localhost', db='tukutter', charset='utf8')
+    connect = db.cursor()
+
+    # Find the user's id, username, password.
+    sql = 'select id, username, password from user where login_id = %s'
+    connect.execute( sql, [login_id] )
+    result = connect.fetchall()
+
+    user_id   = result[0][0]
+    username  = result[0][1]
+    corr_pass = result[0][2]
+
+    # Reject incorrect password.
+    if in_pass != corr_pass:
+        return 'パスワードが間違っています。'
+
+    # Get users who are followed by login user.
+    sql = 'select user_id from follow where follower_id = %s'
+    connect.execute( sql, [user_id] )
+    result = connect.fetchall()
+
+    flw_id = [0] * len(result)
+    
+    for num in range(len(result)):
+        flw_id[num] = result[num][0]
+
+    flw_id = flw_id.append(user_id)
+    
+    # Get tweets.
+    sql = 'select id, user_id, content, time from tweet where user_id = %s'
+    connect.execute( sql, [flw_id] )
+    result = []
+    result = connect.fetchall()
+
+    print(result[0][0])
+    
+    return 'aaa' 
+    
+    
