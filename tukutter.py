@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import Flask, request, render_template, redirect
 import MySQLdb
 
@@ -73,7 +74,7 @@ def top():
         return render_template( 'error.html', message='パスワードが間違っています。' )
 
     # Get users who are followed by login user.
-    sql = 'select user_id from follow where follower_id = %s'
+    sql = 'select user_id from follow where active_flg = 1 and follower_id = %s'
     connect.execute( sql, [user_id] )
     result = connect.fetchall()
 
@@ -90,9 +91,11 @@ def top():
     for num in range(len(flw_id)-1):
         sql = sql + ' or user_id = %s'
 
+    sql = sql + ' order by time desc'
+    
     connect.execute( sql, flw_id )
     result = connect.fetchall()
         
-    return 'aaa'
+    return result[0][3].strftime('%Y/%m/%d %H:%M')
     
     
