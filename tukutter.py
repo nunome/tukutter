@@ -22,7 +22,7 @@ def signup():
     
     # Check password.
     if request.form['password'] != request.form['conf_password']:
-        return render_template( 'mismatch_password.html', message='パスワードが一致していません。' )
+        return render_template( 'error.html', message='パスワードが一致していません。' )
 
     # Connect to database.
     db = MySQLdb.connect( user='root', passwd='YutaOkinawa1211', host='localhost', db='tukutter', charset='utf8')
@@ -70,7 +70,7 @@ def top():
 
     # Reject incorrect password.
     if in_pass != corr_pass:
-        return render_template( incorrect_password.html, message='パスワードが間違っています。' )
+        return render_template( error.html, message='パスワードが間違っています。' )
 
     # Get users who are followed by login user.
     sql = 'select user_id from follow where follower_id = %s'
