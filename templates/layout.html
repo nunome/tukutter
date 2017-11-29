@@ -5,7 +5,8 @@
     <LINK rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
-    <p> <img src=""{{prof_pict}}"" title="Profile picture" onclick="location.href='/profile'"> {{username}} </p>
+    {% block username %}
+    {% endblock %}
     <ul class="nav">
       <li><a href="/top">top</a>
       <li><a href="/search">検索</a>
@@ -14,6 +15,8 @@
       <li><a href="/logout">ログアウト</a>					
     </ul>
   </body>
+  {% block content %}
+  {% endblock %}
 </html>
 
     

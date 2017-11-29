@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+
+{% block username %}
+<img src=""{{prof_pict}}"" title="Profile picture" onclick="location.href='/profile'"> {{username}}
+{% endblock %}
+
+{% block content %}
+<ul>
+{% for tweet in tweets %}
+    <li>
