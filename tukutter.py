@@ -70,7 +70,7 @@ def top():
 
     # Reject incorrect password.
     if in_pass != corr_pass:
-        return render_template( error.html, message='パスワードが間違っています。' )
+        return render_template( 'error.html', message='パスワードが間違っています。' )
 
     # Get users who are followed by login user.
     sql = 'select user_id from follow where follower_id = %s'
