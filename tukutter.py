@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import Flask, request, render_template, redirect
 import MySQLdb
 
@@ -57,8 +58,8 @@ def top():
     db = MySQLdb.connect( user='root', passwd='YutaOkinawa1211', host='localhost', db='tukutter', charset='utf8')
     connect = db.cursor()
 
-    # Find the user's id, username, password.
-    sql = 'select id, username, password from user where login_id = %s'
+    # Find the user's id, username, and password.
+    sql = 'select id, username, password from user where active_flg = 1 and login_id = %s'
     connect.execute( sql, [login_id] )
     result = connect.fetchall()
 
@@ -73,7 +74,7 @@ def top():
         return render_template( 'error.html', message='パスワードが間違っています。' )
 
     # Get users who are followed by login user.
-    sql = 'select user_id from follow where follower_id = %s'
+    sql = 'select user_id from follow where active_flg = 1 and follower_id = %s'
     connect.execute( sql, [user_id] )
     result = connect.fetchall()
 
@@ -81,17 +82,20 @@ def top():
     
     for num in range(len(result)):
         flw_id[num] = result[num][0]
-
-    flw_id = flw_id.append(user_id)
     
+    flw_id.append(user_id)
+        
     # Get tweets.
-    sql = 'select id, user_id, content, time from tweet where user_id = %s'
-    connect.execute( sql, [flw_id] )
-    result = []
-    result = connect.fetchall()
-
-    print(result[0][0])
+    sql = 'select id, user_id, content, time from tweet where active_flg = 1 and user_id = %s'
     
-    return 'aaa' 
+    for num in range(len(flw_id)-1):
+        sql = sql + ' or user_id = %s'
+
+    sql = sql + ' order by time desc'
+    
+    connect.execute( sql, flw_id )
+    result = connect.fetchall()
+        
+    return result[0][3].strftime('%Y/%m/%d %H:%M')
     
     
