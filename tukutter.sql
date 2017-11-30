@@ -16,6 +16,9 @@ CREATE TABLE `tukutter`.`user` (
   UNIQUE INDEX `login_id_UNIQUE` (`login_id` ASC),
   UNIQUE INDEX `username_UNIQUE` (`username` ASC));
 
+ALTER TABLE `tukutter`.`user` 
+ADD COLUMN `prof_pict` VARCHAR(255) NULL COMMENT 'link to profile picture' AFTER `profile`;
+
 -- Create "tweet" table. --
 
 CREATE TABLE `tukutter`.`tweet` (
