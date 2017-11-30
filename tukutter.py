@@ -6,6 +6,12 @@ application = Flask(__name__)
 
 url = 'http://localhost:8080'
 
+# Connect to database.
+def connect_db():
+    
+    db = MySQLdb.connect( user='root', passwd='YutaOkinawa1211', host='localhost', db='tukutter', charset='utf8')
+    return db
+
 # Redirect access from root to login.
 @application.route('/')
 def index():
@@ -26,9 +32,9 @@ def signup():
         return render_template( 'error.html', message='パスワードが一致していません。' )
 
     # Connect to database.
-    db = MySQLdb.connect( user='root', passwd='YutaOkinawa1211', host='localhost', db='tukutter', charset='utf8')
+    db = connect_db()
     connect = db.cursor()
-
+    
     # Add new user to "user" table.
     sql = 'insert into user( login_id, password, username ) value ( %s, %s, %s )'
     connect.execute( sql, [ request.form['login_id'], request.form['password'], request.form['username'] ] )
@@ -55,7 +61,7 @@ def top():
     in_pass = request.form['password']
     
     # Connect to database.
-    db = MySQLdb.connect( user='root', passwd='YutaOkinawa1211', host='localhost', db='tukutter', charset='utf8')
+    db = connect_db()
     connect = db.cursor()
 
     # Find the user's id, username, and password.
