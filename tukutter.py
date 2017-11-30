@@ -4,14 +4,14 @@ import MySQLdb
 
 application = Flask(__name__)
 
-# url = 'http://localhost:8080'
+url = 'http://localhost:8080'
 
 # Redirect access from root to login.
 @application.route('/')
 def index():
 
-    url = 'http://localhost:8080'
-    
+    global url
+
     # Redirect to login page.
     return redirect( url + '/static/login.html' )
 
@@ -19,7 +19,7 @@ def index():
 @application.route('/signup', methods=['POST'])
 def signup():
 
-    url = 'http://localhost:8080'
+    global url
     
     # Check password.
     if request.form['password'] != request.form['conf_password']:
@@ -46,7 +46,7 @@ def signup():
 @application.route('/top', methods=['POST'])
 def top():
 
-    url = 'http://localhost:8080'
+    global url
     
     # Find login user.
 
