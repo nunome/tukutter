@@ -48,6 +48,12 @@ def signup():
     # [Need to change] Jump to top menu. 
     return redirect( url + '/static/login.html' )
 
+# Process signin.
+@application.route('/signin', methods=['POST'])
+def signin():
+
+    
+
 # Show top menu.
 @application.route('/top', methods=['POST'])
 def top():
@@ -84,11 +90,12 @@ def top():
     connect.execute( sql, [user_id] )
     result = connect.fetchall()
 
-    flw_id = [0] * len(result)
+    # flw_id = [0] * len(result)
     
     for num in range(len(result)):
-        flw_id[num] = result[num][0]
-    
+        # flw_id[num] = result[num][0]
+        flw_id.append(result[num][0])
+                      
     flw_id.append(user_id)
         
     # Get tweets.
