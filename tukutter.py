@@ -12,14 +12,30 @@ def connect_db():
     db = MySQLdb.connect( user='root', passwd='YutaOkinawa1211', host='localhost', db='tukutter', charset='utf8')
     return db
 
+# Run this process before every route() function.
+@application.before_request
+def pre_request():
+
+    # Consider signed in if 'True' at session.
+    if session.get('signin'):
+        return
+    
+    # No check if sign in page is requested.
+    elif request.path == '/signin':
+        return
+
+    #
+    else:
+        return redirect( url + '/static/signin.html' ) 
+    
 # Redirect access from root to login.
 @application.route('/')
-def index():
+def root_access():
 
     global url
 
     # Redirect to login page.
-    return redirect( url + '/static/login.html' )
+    return redirect( url + '/static/signin.html' )
 
 # Add new user.
 @application.route('/signup', methods=['POST'])
