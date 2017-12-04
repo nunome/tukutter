@@ -68,12 +68,10 @@ def pre_request():
         else:
             # Redirect to sign in page.
             return redirect( url + '/static/signin.html' )
-        
+
 # Redirect access from root to sign in page.
 @application.route('/')
 def root_access():
-
-    global url
 
     # Redirect to login page.
     return redirect( url_for('top') )
@@ -89,7 +87,7 @@ def signup():
     conf_password = request.form['conf_password']
     username      =      request.form['username']
     
-    # Check password.
+    # Collate password.
     if password != conf_password:
         return render_template( 'error.html', message='パスワードが一致していません。' )
 
@@ -114,8 +112,8 @@ def signup():
     db.close()
     connect.close()
 
-    return redirect( url_for('top' )
-    
+    return redirect( url_for('top' ) )
+
 # Process sign in.
 @application.route('/signin', methods=['POST'])
 def signin():
@@ -162,26 +160,12 @@ def signin():
 def top():
     
     # Get login user's value from session.
-    
+    user_id = session['user_id']
+    username = session['username']
                      
     # Connect to database.
     db = connect_db()
     connect = db.cursor()
-
-    # Find the user's id, username, and password.
-    sql = 'select id, username, password from user where active_flg = 1 and login_id = %s'
-    connect.execute( sql, [login_id] )
-    result = connect.fetchall()
-
-    # [Not equiped] If login_id is not found, show error page.
-    
-    user_id   = result[0][0]
-    username  = result[0][1]
-    corr_pass = result[0][2]
-
-    # Reject incorrect password.
-    if in_pass != corr_pass:
-        return render_template( 'error.html', message='パスワードが間違っています。' )
 
     # Get users who are followed by login user.
     sql = 'select user_id from follow where active_flg = 1 and follower_id = %s'
