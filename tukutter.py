@@ -22,6 +22,17 @@ def publish_session( user_ID, username, signin ):
     session['username'] = username
     session['signin']   = True
 
+# Publish cookie.
+def publish_cookie( resp, login_id, password ):
+
+    global url
+    
+    max_age = 60*60*24 # 1day
+    expires = int( datetime.now().timestamp() ) + max_age
+    
+    resp.set_cookie( 'login_id', value=login_id, 'password'=password,
+                     max_age=max_age, expires=expires, domain=url )
+
 # Run this process before every route() function.
 @application.before_request
 def pre_request():
@@ -40,7 +51,8 @@ def pre_request():
     
     if cookie_lid == None:
         # Redirect to sign in page.
-        return redirect( url + '/static/signin.html' ) 
+        return redirect( url + '/static/signin.html' )
+    
     else:
         # Collate password
         cookie_pw = request.cookies.get( 'password' )
@@ -108,6 +120,9 @@ def signup():
     # Publish session ID.
     publish_session( user_id, username, True )
 
+    # Publish cookie.
+    publish_cookie( redirect( url_for('top' ) ), login_id, password )
+    
     # Disconnect form database.
     db.close()
     connect.close()
@@ -148,7 +163,10 @@ def signin():
     if in_pw == corr_pw:
         # Publish session ID.
         publish_session( user_id, username, True )
-                     
+
+        # Publish cookie.
+        publish_cookie( redirect( url_for('top' ) ), login_id, password )
+
         # Redirect to top page with username.
         return redirect( url_for('top' ) )
 
