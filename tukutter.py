@@ -30,7 +30,7 @@ def publish_cookie( resp, login_id, password ):
     max_age = 60*60*24 # 1day
     expires = int( datetime.now().timestamp() ) + max_age
     
-    resp.set_cookie( 'login_id', value=login_id, 'password'=password,
+    resp.set_cookie( 'login_id', login_id, 'password', password,
                      max_age=max_age, expires=expires, domain=url )
 
 # Run this process before every route() function.
