@@ -8,7 +8,9 @@ application = Flask(__name__)
 application.secret_key = os.urandom(24)
 
 # url = 'http://localhost:8080'
-url = 'http://tukutter.test:8080'
+url_base   = 'http://tukutter.test:8080'
+# url_login  = '/static/login.html'
+url_login = '/static/test-page/signin.html'
 
 # Connect to database.
 def connect_db():
@@ -48,7 +50,8 @@ def publish_cookie( link_to, login_id, password ):
 @application.before_request
 def pre_request():
 
-    global url
+    global url_base
+    global url_login
     
     # Consider signed in if 'True' at session.
     if session.get('signin'):
@@ -62,7 +65,7 @@ def pre_request():
     
     if cookie_lid == None:
         # Redirect to sign in page.
-        return redirect( url + '/static/signin.html' )
+        return redirect( url_base + url_login )
     
     else:
         # Collate password
@@ -90,23 +93,23 @@ def pre_request():
 
         else:
             # Redirect to sign in page.
-            return redirect( url + '/static/signin.html' )
+            return redirect( url_base + url_login )
 
 # Redirect access from root to sign in page.
 @application.route('/')
 def root_access():
 
-    global url
+    global url_base
     
     # Redirect to login page.
      #return redirect( url_for('top') )
-    return redirect( url + '/top' )
+    return redirect( url_base+'/top' )
 
 # Add new user.
 @application.route('/signup', methods=['POST'])
 def signup():
 
-    global url
+    global url_base
 
     login_id      =      request.form['login_id']
     password      =      request.form['password']
@@ -135,19 +138,19 @@ def signup():
     publish_session( user_id, username, True )
 
     # Publish cookie.
-    publish_cookie( url+'top', login_id, password )
+    publish_cookie( url_base+'/top', login_id, password )
     
     # Disconnect form database.
     db.close()
     connect.close()
 
-    return redirect( url + '/top' )
+    return redirect( url_base+'/top' )
 
 # Process sign in.
 @application.route('/signin', methods=['POST'])
 def signin():
 
-    global url
+    global url_base
     
     # Find sign in user.
 
@@ -177,18 +180,11 @@ def signin():
     if in_pw == corr_pw:
         # Publish session ID.
         publish_session( user_id, username, True )
-
-        print('end session')
         
-        # Publish cookie.
-        resp =  publish_cookie( url+'/top', login_id, in_pw )
-
-        print('end cookie')
+        # Publish cookie then link to '/top'.
+        resp =  publish_cookie( url_base+'/top', login_id, in_pw )
 
         return resp
-        # Redirect to top page with username.
-          # return redirect( url_for('top' ) )
-          # return redirect( url + '/top' )
 
     else:
         return render_template( 'error.html', message='パスワードが間違っています。' )
@@ -228,11 +224,12 @@ def top():
     sql = sql + ' order by time desc'
     
     connect.execute( sql, flw_id )
-    result = connect.fetchall()
+    tweets = connect.fetchall()
 
-    # test
-    # print( request.cookies.get('password') )
-    
-    return result[0][3].strftime('%Y/%m/%d %H:%M')
+    str_tweet = 'tweet_id, user_id, content, time, </br>'
+    for tweet in tweets:
+        str_tweet = str_tweet + str(tweet[0]) + ', ' + str(tweet[1]) + ', ' + tweet[2] + ', ' + tweet[3].strftime('%Y/%m/%d %H:%M') + '</br>'
+    return str_tweet 
+    # return render_template( 'index.html', username=username, tweet=tweet )
     
     
