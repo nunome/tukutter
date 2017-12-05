@@ -28,8 +28,6 @@ def publish_session( user_id, username, signin ):
 # Publish cookie.
 def publish_cookie( link_to, login_id, password ):
 
-    global url
-
     resp = make_response( redirect(link_to) )
     
     max_age = 60*60*24 # 1day
@@ -58,7 +56,7 @@ def pre_request():
         return
     
     # No check if sign in page is requested.
-    if request.path == '/signin':
+    if request.path == '/signin' or request.path == '/signup':
         return
 
     cookie_lid = request.cookies.get( 'login_id', None )
@@ -128,23 +126,23 @@ def signup():
     sql = 'insert into user( login_id, password, username ) value ( %s, %s, %s )'
     connect.execute( sql, [ login_id, password, username ] )
     db.commit()
-
+    
     # Get user_ID from SQL server.
     sql = 'select id from user where active_flg = 1 and login_id = %s'
-    connect.execute( sql, login_id )
-    user_id = connect.fetchall() # [0][0]
+    connect.execute( sql, [login_id] )
+    user_id = connect.fetchall()[0][0]
     
     # Publish session ID.
     publish_session( user_id, username, True )
 
     # Publish cookie.
-    publish_cookie( url_base+'/top', login_id, password )
+    resp = publish_cookie( url_base+'/top', login_id, password )
     
     # Disconnect form database.
     db.close()
     connect.close()
 
-    return redirect( url_base+'/top' )
+    return resp
 
 # Process sign in.
 @application.route('/signin', methods=['POST'])
@@ -206,11 +204,10 @@ def top():
     connect.execute( sql, [user_id] )
     result = connect.fetchall()
 
-    # flw_id = [0] * len(result)
     flw_id = []
     
     for num in range(len(result)):
-        # flw_id[num] = result[num][0]
+        # 
         flw_id.append(result[num][0])
                       
     flw_id.append(user_id)
