@@ -1,13 +1,14 @@
 from datetime import datetime
 import os
-from flask import Flask, request, render_template, redirect, session, url_for
+from flask import Flask, request, render_template, redirect, session, url_for, make_response
 import MySQLdb
 
 application = Flask(__name__)
 
 application.secret_key = os.urandom(24)
 
-url = 'http://localhost:8080'
+# url = 'http://localhost:8080'
+url = 'http://tukutter.test:8080'
 
 # Connect to database.
 def connect_db():
@@ -23,14 +24,16 @@ def publish_session( user_id, username, signin ):
     session['signin']   = True
 
 # Publish cookie.
-def publish_cookie( resp, login_id, password ):
+def publish_cookie( link_to, login_id, password ):
 
     global url
 
+    resp = make_response( redirect(link_to) )
+    
     max_age = 60*60*24 # 1day
     expires = int( datetime.now().timestamp() ) + max_age
     path    = '/'
-    domain  = '127.0.0.1:8080'
+    domain  = 'tukutter.test:8080'
     secure  = None
     httponly = False
     
@@ -38,6 +41,8 @@ def publish_cookie( resp, login_id, password ):
                      max_age, expires, path, domain, secure, httponly )
     resp.set_cookie( 'password', password,
                      max_age, expires, path, domain, secure, httponly )
+    
+    return resp
 
 # Run this process before every route() function.
 @application.before_request
@@ -130,13 +135,13 @@ def signup():
     publish_session( user_id, username, True )
 
     # Publish cookie.
-    publish_cookie( redirect( url_for('top' ) ), login_id, password )
+    publish_cookie( url+'top', login_id, password )
     
     # Disconnect form database.
     db.close()
     connect.close()
 
-    return redirect( url_for('top' ) )
+    return redirect( url + '/top' )
 
 # Process sign in.
 @application.route('/signin', methods=['POST'])
@@ -173,12 +178,17 @@ def signin():
         # Publish session ID.
         publish_session( user_id, username, True )
 
+        print('end session')
+        
         # Publish cookie.
-        publish_cookie( redirect( url_for('top' ) ), login_id, in_pw )
+        resp =  publish_cookie( url+'/top', login_id, in_pw )
 
+        print('end cookie')
+
+        return resp
         # Redirect to top page with username.
           # return redirect( url_for('top' ) )
-        return redirect( url + '/top' )
+          # return redirect( url + '/top' )
 
     else:
         return render_template( 'error.html', message='パスワードが間違っています。' )
@@ -219,7 +229,10 @@ def top():
     
     connect.execute( sql, flw_id )
     result = connect.fetchall()
-        
+
+    # test
+    # print( request.cookies.get('password') )
+    
     return result[0][3].strftime('%Y/%m/%d %H:%M')
     
     
