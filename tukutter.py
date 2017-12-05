@@ -16,7 +16,7 @@ def connect_db():
     return db
 
 # Publish session ID.
-def publish_session( user_ID, username, signin ):
+def publish_session( user_id, username, signin ):
 
     session['user_id']  = user_id
     session['username'] = username
@@ -26,12 +26,18 @@ def publish_session( user_ID, username, signin ):
 def publish_cookie( resp, login_id, password ):
 
     global url
-    
+
     max_age = 60*60*24 # 1day
     expires = int( datetime.now().timestamp() ) + max_age
+    path    = '/'
+    domain  = '127.0.0.1:8080'
+    secure  = None
+    httponly = False
     
-    resp.set_cookie( 'login_id', login_id, 'password', password,
-                     max_age=max_age, expires=expires, domain=url )
+    resp.set_cookie( 'login_id', login_id,
+                     max_age, expires, path, domain, secure, httponly )
+    resp.set_cookie( 'password', password,
+                     max_age, expires, path, domain, secure, httponly )
 
 # Run this process before every route() function.
 @application.before_request
@@ -85,8 +91,11 @@ def pre_request():
 @application.route('/')
 def root_access():
 
+    global url
+    
     # Redirect to login page.
-    return redirect( url_for('top') )
+     #return redirect( url_for('top') )
+    return redirect( url + '/top' )
 
 # Add new user.
 @application.route('/signup', methods=['POST'])
@@ -165,10 +174,11 @@ def signin():
         publish_session( user_id, username, True )
 
         # Publish cookie.
-        publish_cookie( redirect( url_for('top' ) ), login_id, password )
+        publish_cookie( redirect( url_for('top' ) ), login_id, in_pw )
 
         # Redirect to top page with username.
-        return redirect( url_for('top' ) )
+          # return redirect( url_for('top' ) )
+        return redirect( url + '/top' )
 
     else:
         return render_template( 'error.html', message='パスワードが間違っています。' )
