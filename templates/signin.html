@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+
+{% block css %}signin{% endblock %}
+
+{% block title %}signin{% endblock %}
+
+{% block body %}
+<main id="login">
+   <div class="logo">
+      <img class="logo-pic" src="../static/img/logo-pic.png" alt="">
+      <img class="logo-text" src="../static/img/logo-text.png" alt="">
+   </div>
+  <form action="/signin" method="post">
+    <div class="inline">
+      <label for="userid">user ID</label>
+      <input class="view-pc" type="text" name="login_id" value="">
+      <!-- <input class="view-sp" type="text" name="login_id" placeholder="login_id" value="login_id"> -->
+    </div>
+    <div class="inline">
+      <label for="password">password</label>
+      <input class="view-pc" type="password" name="password" value="">
+      <!-- <input class="view-sp" type="password" name="password" placeholder="password" value="password"> -->
+    </div>
+    <input class="button submit" type="submit" name="submit" value="Log in">
+  </form>
+  <div class="registration">
+    <p><a href="/signup">新規会員登録する</a></p>
+  </div>
+</main>
+{% endblock %}

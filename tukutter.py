@@ -7,10 +7,10 @@ application = Flask(__name__)
 
 application.secret_key = os.urandom(24)
 
-# url = 'http://localhost:8080'
-url_base   = 'http://tukutter.test:8080'
+url_base = 'http://localhost:8080'
+# url_base   = 'http://tukutter.test:8080'
 # url_login  = '/static/login.html'
-url_login = '/static/test-page/signin.html'
+# url_login = '/static/test-page/signin.html'
 
 # Connect to database.
 def connect_db():
@@ -23,8 +23,8 @@ def publish_session( user_id, username, signin ):
 
     session['user_id']  = user_id
     session['username'] = username
-    session['signin']   = True
-
+    session['signin'] = True
+    
 # Publish cookie.
 def publish_cookie( link_to, login_id, password ):
 
@@ -32,15 +32,13 @@ def publish_cookie( link_to, login_id, password ):
     
     max_age = 60*60*24 # 1day
     expires = int( datetime.now().timestamp() ) + max_age
-    path    = '/'
-    domain  = 'tukutter.test:8080'
-    secure  = None
-    httponly = False
+    # path    = '/'
+    # domain  = 'tukutter.test:8080'
+    # secure  = None
+    # httponly = False
     
-    resp.set_cookie( 'login_id', login_id,
-                     max_age, expires, path, domain, secure, httponly )
-    resp.set_cookie( 'password', password,
-                     max_age, expires, path, domain, secure, httponly )
+    resp.set_cookie( 'login_id', login_id, max_age, expires )
+    resp.set_cookie( 'password', password, max_age, expires )
     
     return resp
 
@@ -49,7 +47,6 @@ def publish_cookie( link_to, login_id, password ):
 def pre_request():
 
     global url_base
-    global url_login
     
     # Consider signed in if 'True' at session.
     if session.get('signin'):
@@ -63,7 +60,7 @@ def pre_request():
     
     if cookie_lid == None:
         # Redirect to sign in page.
-        return redirect( url_base + url_login )
+        return redirect( url_base + '/signin' )
     
     else:
         # Collate password
@@ -100,15 +97,18 @@ def root_access():
     global url_base
     
     # Redirect to login page.
-     #return redirect( url_for('top') )
     return redirect( url_base+'/top' )
 
 # Add new user.
-@application.route('/signup', methods=['POST'])
+@application.route('/signup', methods=['POST','GET'])
 def signup():
 
     global url_base
 
+    if request.method == 'GET':
+        # Show sign up page.
+        return render_template( 'signup.html' ) 
+    
     login_id      =      request.form['login_id']
     password      =      request.form['password']
     conf_password = request.form['conf_password']
@@ -121,7 +121,7 @@ def signup():
     # Connect to database.
     db = connect_db()
     connect = db.cursor()
-    
+
     # Add new user to "user" table.
     sql = 'insert into user( login_id, password, username ) value ( %s, %s, %s )'
     connect.execute( sql, [ login_id, password, username ] )
@@ -145,16 +145,20 @@ def signup():
     return resp
 
 # Process sign in.
-@application.route('/signin', methods=['POST'])
+@application.route('/signin', methods=['POST','GET'])
 def signin():
 
     global url_base
+
+    if request.method == 'GET':
+        # Show sign in page.
+        return render_template( 'signin.html' )
     
     # Find sign in user.
 
     # Get login user's value from web form.
     login_id = request.form['login_id']
-    in_pw = request.form['password']
+    in_pw    = request.form['password']
     
     # Connect to database.
     db = connect_db()
