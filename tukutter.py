@@ -23,7 +23,7 @@ def publish_session( user_id, username, signin ):
 
     session['user_id']  = user_id
     session['username'] = username
-    session['signin'] = True
+    session['signin']   = True
     
 # Publish cookie.
 def publish_cookie( link_to, login_id, password ):
@@ -196,7 +196,7 @@ def signin():
 def top():
     
     # Get login user's value from session.
-    user_id = session['user_id']
+    user_id  = session['user_id']
     username = session['username']
                      
     # Connect to database.
@@ -215,8 +215,6 @@ def top():
             'inner join user on user.id = tweet.user_id ' +
             'where follow.follower_id = %s ' +
             'order by tweet.time desc' )
-
-    print(sql)
     
     connect.execute( sql, [user_id] )    
     tweets = connect.fetchall()
@@ -227,7 +225,25 @@ def top():
 
     return render_template( 'index.html', user=user, tweets=tweets )
     
-@application.route('/prof_edit')
+@application.route('/prof_edit', methods=['GET', 'POST'])
 def prof_edit():
 
-    pass
+    if request.method == 'GET':
+        # Show profile edit page.
+        return render_template( 'profile_edit.html' )
+
+    user_id  = session['user_id']
+    username = session['username']
+    
+    # Get new user's value from web form.
+     # login_id = request.form['login_id']
+    new_pw1  = request.form['password']
+    nem_pw2  = request.form['conf_password']
+    username = request.form['username']
+
+    if new_pw1 != new_pw2:
+        return render_template( 'error.html', message='パスワードが一致していません。' )
+
+
+    return render_template( 'profile.html' )
+
