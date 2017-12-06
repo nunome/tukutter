@@ -8,9 +8,6 @@ application = Flask(__name__)
 application.secret_key = os.urandom(24)
 
 url_base = 'http://localhost:8080'
-# url_base   = 'http://tukutter.test:8080'
-# url_login  = '/static/login.html'
-# url_login = '/static/test-page/signin.html'
 
 # Connect to database.
 def connect_db():
@@ -238,12 +235,17 @@ def prof_edit():
     # Get new user's value from web form.
      # login_id = request.form['login_id']
     new_pw1  = request.form['password']
-    nem_pw2  = request.form['conf_password']
+    new_pw2  = request.form['conf_password']
     username = request.form['username']
 
     if new_pw1 != new_pw2:
         return render_template( 'error.html', message='パスワードが一致していません。' )
 
-
+    if len(new_pw1) != 0:
+        sql = 'update password 
+    
+    print(username)
+    print(new_pw1)
+    
     return render_template( 'profile.html' )
 
