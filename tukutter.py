@@ -225,7 +225,7 @@ def top():
 
     return render_template( 'index.html', user=user, tweets=tweets )
     
-@application.route('/prof_edit', methods=['GET', 'POST'])
+@application.route('/profile_edit', methods=['GET', 'POST'])
 def prof_edit():
 
     if request.method == 'GET':
