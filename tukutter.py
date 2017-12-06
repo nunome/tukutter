@@ -203,34 +203,71 @@ def top():
     db = connect_db()
     connect = db.cursor()
 
+    # Get user's profile info includes image.
+    sql = 'select prof_pict, username from user where id = %s'
+    connect.execute( sql, [user_id] )
+    user = connect.fetchall()
+
+    print('Got "user"')
+    print('user_id: ' + str(user_id))
+    
     # Get users who are followed by login user.
     sql = 'select user_id from follow where active_flg = 1 and follower_id = %s'
     connect.execute( sql, [user_id] )
-    result = connect.fetchall()
+    temp = connect.fetchall()
 
-    flw_id = []
+    print('Got followed users')
     
-    for num in range(len(result)):
-        # 
-        flw_id.append(result[num][0])
+    follow_id = []
+    
+    for num in range(len(temp)):
+        # Get user id from result. 
+        follow_id.append(temp[num][0])
                       
-    flw_id.append(user_id)
-        
-    # Get tweets.
-    sql = 'select id, user_id, content, time from tweet where active_flg = 1 and user_id = %s'
+    follow_id.append(user_id)
+
+    print('Made follow_id')
     
-    for num in range(len(flw_id)-1):
+    view_name = username + '_top'
+
+    # Get tweets as view.
+    sql = ''
+    
+    for num in range(len(follow_id)-1):
         sql = sql + ' or user_id = %s'
 
     sql = sql + ' order by time desc'
+
+    print(sql)
+    print([view_name + str(follow_id)])
+    connect.execute( sql, [view_name, follow_id] )
+    # tweets = connect.fetchall()
+
+    print('Created view')
     
-    connect.execute( sql, flw_id )
+    # Get user info related each tweets.
+    sql = 'select user.prof_pict, user.username, %s.time, %s.content from user inner join %s on user.id = %s.user_id where user.id = %s'
+    connect.execute( sql, [view_name, view_name, view_name, view_name, follow_id] )
     tweets = connect.fetchall()
 
-    str_tweet = 'tweet_id, user_id, content, time, </br>'
-    for tweet in tweets:
-        str_tweet = str_tweet + str(tweet[0]) + ', ' + str(tweet[1]) + ', ' + tweet[2] + ', ' + tweet[3].strftime('%Y/%m/%d %H:%M') + '</br>'
-    return str_tweet 
-    # return render_template( 'index.html', username=username, tweet=tweet )
+    print('Got tweets')
+    
+    # Delete view.
+    sql = 'drop view %s'
+    connect.execute( sql, view_name )
+
+    print('Deleted view')
+    
+    # Disconnect form database.
+    db.close()
+    connect.close()
+
+    # str_tweet = 'tweet_id, user_id, content, time, </br>'
+    # for tweet in tweets:
+        # str_tweet = str_tweet + str(tweet[0]) + ', ' + str(tweet[1]) + ', ' + tweet[2] + ', ' + tweet[3].strftime('%Y/%m/%d %H:%M') + '</br>'
+    # return str_tweet 
+
+    return tweets[0][0]
+    # return render_template( 'index.html', tweets=tweets )
     
     
