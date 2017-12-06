@@ -2,7 +2,7 @@
 
 {% block css %}signin{% endblock %}
 
-{% block title %}signin{% endblock %}
+{% block title %}login{% endblock %}
 
 {% block body %}
 <main id="login">
@@ -13,13 +13,11 @@
   <form action="/signin" method="post">
     <div class="inline">
       <label for="userid">user ID</label>
-      <input class="view-pc" type="text" name="login_id" value="">
-      <!-- <input class="view-sp" type="text" name="login_id" placeholder="login_id" value="login_id"> -->
+      <input type="text" name="login_id" value="">
     </div>
     <div class="inline">
       <label for="password">password</label>
-      <input class="view-pc" type="password" name="password" value="">
-      <!-- <input class="view-sp" type="password" name="password" placeholder="password" value="password"> -->
+      <input type="password" name="password" value="">
     </div>
     <input class="button submit" type="submit" name="submit" value="Log in">
   </form>

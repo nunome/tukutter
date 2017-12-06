@@ -13,3 +13,22 @@ $c_accent:#B9DCF2;
   background-color: $c_main;
   color: #FFFFFF;
 }
+
+input,textarea {
+  border: solid 1px $c_font;
+}
+
+.view-pc {
+  display: inline;
+}
+.view-sp {
+  display: none;
+}
+@media (max-width:599px) {
+  .view-pc {
+    display: none;
+  }
+  .view-sp {
+    display: inline;
+  }
+}

@@ -1,0 +1,193 @@
+#index {
+  header {
+    background-color: #f7b52c;
+
+    .profile {
+      display: inline-block;
+      width: 100%;
+
+      img {
+        position: absolute;
+        width: 6%;
+        margin: 1vw 1vw;
+      }
+      p {
+        font-size: 8vw;
+        text-align: center;
+      }
+
+    }
+
+    nav {
+      ul {
+        border: solid 1px;
+        background-color: #EEEEEE;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+
+        li {
+          text-align: center;
+
+          a {
+            display: inline-block;
+            padding: 0.7vw 0;
+            width: 10vw;
+            font-size: 1.1vw;
+          }
+          a:hover {
+            text-decoration: none;
+          }
+        }
+        li:hover {
+          background-color: #EEEEEE;
+          filter: brightness(80%);
+        }
+      }
+      ul.fixed {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        padding-top: 8px;
+      }
+    }
+  }
+
+  .stream {
+    width: 38vw;
+    margin: 0 auto;
+
+    .content {
+      margin-top: 2vw;
+      background-color: #EEEEEE;
+
+      .stream-header {
+        display: flex;
+
+        img {
+          margin: 1vw 1vw;
+          width: 4vw;
+          height: 4vw;
+        }
+        p {
+
+          span {
+            display: inline-block;
+            font-size: 2vw;
+            margin: 3vw 0 0 0.5vw;
+          }
+          span.tweet-time {
+            font-size:0.8vw;
+          }
+          span.follow {
+            margin-left: 1vw;
+            padding:0.2vw;
+            font-size:0.8vw;
+            background-color: #B9DCF2;
+          }
+        }
+      }
+
+      .inline {
+        display: flex;
+
+        .stream-content {
+          width: 85%;
+
+           p {
+             padding: 1vw 0.5vw 1vw 2vw;
+           }
+        }
+        .stream-footer {
+          width: 15%;
+          margin-top: 5vw;
+          margin-bottom: 1vw;
+
+          .favorite {
+            a {
+              img {
+                width: 70%;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  .stream.fixed {
+    margin-top: 65px;
+  }
+
+}
+
+@media (max-width:599px) {
+  #index {
+    header {
+      .profile {
+        height: 20vw;
+
+        img {
+          width: 17%;
+          margin: 1.5vw;
+        }
+        p {
+          font-size: 18vw;
+        }
+      }
+      nav {
+        ul {
+          li {
+            width: 20%;
+            a {
+              display: inline-block;
+              width: 90%;
+              padding: 2vw 0;
+              font-size: 3vw;
+            }
+          }
+        }
+      }
+    }
+
+    .stream {
+      width: 90vw;
+
+      .content {
+        .stream-header {
+          img {
+            width: 15vw;
+            height: 15vw;
+          }
+          p {
+            span.user-name {
+              font-size: 10vw;
+              word-break: break-all
+            }
+          }
+        }
+
+        .inline {
+          .stream-content {
+            p {
+              line-height: 1.4;
+              padding: 5vw 2.5vw 5vw 3vw;
+            }
+          }
+
+          .stream-footer {
+            .favorite {
+              a {
+                img {
+
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    .stream.fixed {
+      margin-top: 35px;
+    }
+  }
+}

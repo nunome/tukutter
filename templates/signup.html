@@ -2,7 +2,7 @@
 
 {% block css %}signup{% endblock %}
 
-{% block title %}signup{% endblock %}
+{% block title %}新規登録{% endblock %}
 
 {% block body %}
 <main id="registration">
@@ -13,23 +13,19 @@
   <form action="/signup" method="post">
     <div class="inline">
       <label for="userid">user ID</label>
-      <input class="view-pc" type="text" name="login_id" value="">
-      <!-- <input class="view-sp" type="text" name="userid" placeholder="user ID" value=""> -->
+      <input type="text" name="login_id" value="">
     </div>
     <div class="inline">
       <label for="password">password</label>
-      <input class="view-pc" type="password" name="password" value="">
-      <!-- <input class="view-sp" type="password" name="password" placeholder="password" value=""> -->
+      <input type="password" name="password" value="">
     </div>
     <div class="inline">
       <label for="password">password確認</label>
-      <input class="view-pc" type="password" name="conf_password" value="">
-      <!-- <input class="view-sp" type="password" name="password" placeholder="password" value=""> -->
+      <input type="password" name="conf_password" value="">
     </div>
     <div class="inline">
       <label for="password">お名前</label>
-      <input class="view-pc" type="text" name="username" value="">
-      <!-- <input class="view-sp" type="text" name="username" placeholder="お名前" value=""> -->
+      <input type="text" name="username" value="">
     </div>
     <input class="button submit" type="submit" name="submit" value="新規登録">
   </form>

@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block css %}profile_edit{% endblock %}
+
+{% block title %}プロフィール編集{% endblock %}
+
+{% block body %}
+
+<main id="profile_edit">
+  <div class="logo">
+    <p>ユーザー登録</p>
+  </div>
+  <form action="#" method="post">
+    <div class="inline">
+      <label for="userid">image</label>
+      <input id="file" class="file" type="file" name="file" value="">
+              <!-- <label for="file" class="view_box">
+          +画像を選択
+          <input id="file" class="file" type="file" name="file" value="" style="display:none;">
+              </label> -->
+    </div>
+    <div class="inline">
+      <label for="userid">user ID</label>
+      <input type="text" name="userid" value="">
+    </div>
+    <div class="inline">
+      <label for="password">password</label>
+      <input type="password" name="password" value="">
+    </div>
+    <div class="inline">
+      <label for="password">password確認</label>
+      <input type="password" name="password" value="">
+    </div>
+    <div class="inline">
+      <label for="password">お名前</label>
+      <input type="text" name="username" value="">
+    </div>
+    <div class="inline">
+      <label for="password">ひと言</label>
+      <textarea type="text" name="words" value=""></textarea>
+    </div>
+    <input class="button" type="submit" name="submit" value="登録">
+  </form>
+    </main>

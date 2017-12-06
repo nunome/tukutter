@@ -1,1 +1,1 @@
-*{font-family:'Abel', sans-serif;color:#707070}.button{background-color:#f7b52c;color:#FFFFFF}
+*{font-family:'Abel', sans-serif;color:#707070}.button{background-color:#f7b52c;color:#FFFFFF}input,textarea{border:solid 1px #707070}.view-pc{display:inline}.view-sp{display:none}@media (max-width: 599px){.view-pc{display:none}.view-sp{display:inline}}

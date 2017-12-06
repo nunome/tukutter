@@ -1,12 +1,5 @@
 #registration {
 
-  .view-pc {
-    display: inline;
-  }
-  .view-sp {
-    display: none;
-  }
-
   width: 50vw;
   margin: 0 auto;
 
@@ -77,13 +70,6 @@
 @media (max-width:599px) {
   #registration {
 
-    .view-pc {
-      display: none;
-    }
-    .view-sp {
-      display: inline;
-    }
-
     width: 95vw;
     margin: 0 auto;
 
@@ -108,8 +94,12 @@
 
       .inline {
         margin-bottom: 5vw;
+
         label {
-          display: none;
+          font-size: 4vw;
+          width: 60vw;
+          display: block;
+          margin-bottom: 2vw;
         }
 
         input {
