@@ -192,7 +192,7 @@ def signin():
         return render_template( 'error.html', message='パスワードが間違っています。' )
 
 # Show top menu.
-@application.route('/top', methods=['GET'])
+@application.route('/top')
 def top():
     
     # Get login user's value from session.
@@ -225,6 +225,9 @@ def top():
     db.close()
     connect.close()
 
-    return render_template( 'index.html', tweets=tweets )
+    return render_template( 'index.html', user=user, tweets=tweets )
     
-    
+@application.route('/prof_edit')
+def prof_edit():
+
+    pass

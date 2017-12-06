@@ -4,17 +4,17 @@
 
 {% block script %}
   <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-  <script type="text/javascript" src="js/index.js"></script>
+  <script type="text/javascript" src="../static/js/index.js"></script>
 {% endblock %}
   
 {% block title %}top{% endblock %}
 
 {% block body %}
-<main id="index">
+  <main id="index">
     <header>
       <div class="profile">
-	<img src="../static/img/profile.png" alt="">
-	<p>taro</p>
+	<img src={{user[0][0]}} alt="">
+	<p>{{user[0][1]}}</p>
       </div>
       <nav>
 	<ul>
@@ -26,30 +26,30 @@
 	</ul>
       </nav>
     </header>
-
+{% for tweet in tweets %}
     <div class="stream">
       <div class="content">
 	<div class="stream-header">
-	  <img src="img/profile.png" alt="">
+	  <img src={{tweet[0]}} alt="">
 	  <p>
-	    <span class="user-name">taro</span>
-	    <span class="tweet-time">2017/11/22/ 16:20</span>
+	    <span class="user-name">{{tweet[1]}}</span>
+	    <span class="tweet-time">{{tweet[2]}}</span>
 	    <span class="follow">フォロー中</span>
 	  </p>
 	</div>
 	<div class="inline">
 	  <div class="stream-content">
-	    <p>並阿弥陀</p>
+	    <p>{{tweet[3]}}</p>
 	  </div>
 	  <div class="stream-footer">
 	    <div class="favorite">
-	      <a href="#"><img src="img/logo-pic.png" alt=""></a>
+	      <a href="#"><img src="../static/img/logo-pic.png" alt=""></a>
 	    </div>
 	  </div>
 	</div>
       </div>
     </div>
+    {% endfor %}
 </main>
-
 {% endblock %}
   
