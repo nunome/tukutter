@@ -181,13 +181,31 @@ def signin():
         publish_session( user_id, username, True )
         
         # Publish cookie then link to '/top'.
-        resp =  publish_cookie( url_base+'/top', login_id, in_pw )
+        resp =  publish_cookie( url_base + '/top', login_id, in_pw )
 
         return resp
 
     else:
         return render_template( 'error.html', message='パスワードが間違っています。' )
 
+# Process sign out.
+@application.route('/signout')
+def signout():
+
+    global url_base
+
+    # Close session.
+    session.pop( 'username',  None )
+    session.pop( 'user_id',   None )
+    session.pop( 'signin',   False )
+    
+    # Clear cookie then redirect to sign in page.
+    resp =make_response( redirect( url_base + '/signin' ) )
+    resp.set_cookie( 'login_id', None )
+    resp.set_cookie( 'password', None )
+
+    return resp
+    
 # Show top menu.
 @application.route('/top')
 def top():
