@@ -19,6 +19,9 @@ CREATE TABLE `tukutter`.`user` (
 ALTER TABLE `tukutter`.`user` 
 ADD COLUMN `prof_pict` VARCHAR(255) NULL COMMENT 'link to profile picture' AFTER `profile`;
 
+ALTER TABLE `tukutter`.`user` 
+ADD COLUMN `token` VARCHAR(255) NULL COMMENT 'token to sign in' AFTER `prof_pict`;
+
 -- Create "tweet" table. --
 
 CREATE TABLE `tukutter`.`tweet` (

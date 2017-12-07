@@ -23,10 +23,27 @@ def publish_session( user_id, username, signin ):
     session['signin']   = True
     
 # Publish cookie.
-def publish_cookie( link_to, login_id, password ):
+def publish_cookie( link_to, login_id ):
 
+    # Make response object.
     resp = make_response( redirect(link_to) )
+
+    # Publish token.
+    token = os.urandom(24)
+
+    # Store token.
+    db = connect_db
+    connect = db.cursor()
+
+    sql = 'update user set token = %s where login_id = %s'
+    connect.execute( sql, [token, login_id] )
+    db.commit()
+
+    # Disconnect form database.
+    db.close()
+    connect.close()    
     
+    # Set cookie.
     max_age = 60*60*24 # 1day
     expires = int( datetime.now().timestamp() ) + max_age
     # path    = '/'
@@ -35,7 +52,7 @@ def publish_cookie( link_to, login_id, password ):
     # httponly = False
     
     resp.set_cookie( 'login_id', login_id, max_age, expires )
-    resp.set_cookie( 'password', password, max_age, expires )
+    resp.set_cookie( 'token', token, max_age, expires )
     
     return resp
 
@@ -50,33 +67,40 @@ def pre_request():
         return
     
     # No check if sign in page is requested.
-    if request.path == '/signin' or request.path == '/signup':
+    if request.path == '/signin' or \
+       request.path == '/signup' or \
+       request.path == '/signout':
+        
         return
 
-    cookie_lid = request.cookies.get( 'login_id', None )
+    cookie_lid = request.cookies.get( 'login_id', '' )
     
-    if cookie_lid == None:
+    if cookie_lid == '':
         # Redirect to sign in page.
         return redirect( url_base + '/signin' )
     
     else:
         # Collate password
-        cookie_pw = request.cookies.get( 'password' )
+        cookie_token = request.cookies.get( 'token' )
 
         # Connect to database.
         db = connect_db()
         connect = db.cursor()
 
         # Find the user's id, username, and password.
-        sql = 'select id, username, password from user where active_flg = 1 and login_id = %s'
+        sql = 'select id, username, token from user where active_flg = 1 and login_id = %s'
         connect.execute( sql, [cookie_lid] )
         result = connect.fetchall()
-    
-        user_id   = result[0][0]
-        username  = result[0][1]
-        password  = result[0][2]
+
+        # Disconnect form database.
+        db.close()
+        connect.close()
         
-        if cookie_pw == password:
+        user_id  = result[0][0]
+        username = result[0][1]
+        token    = result[0][2]
+        
+        if cookie_token == token:
             # Publish session ID.
             publish_session( user_id, username, True )
             
@@ -133,7 +157,7 @@ def signup():
     publish_session( user_id, username, True )
 
     # Publish cookie.
-    resp = publish_cookie( url_base+'/top', login_id, password )
+    resp = publish_cookie( url_base+'/top', login_id )
     
     # Disconnect form database.
     db.close()
@@ -181,7 +205,7 @@ def signin():
         publish_session( user_id, username, True )
         
         # Publish cookie then link to '/top'.
-        resp =  publish_cookie( url_base + '/top', login_id, in_pw )
+        resp =  publish_cookie( url_base + '/top', login_id )
 
         return resp
 
@@ -195,14 +219,14 @@ def signout():
     global url_base
 
     # Close session.
-    session.pop( 'username',  None )
-    session.pop( 'user_id',   None )
+    session.pop( 'username',    '' )
+    session.pop( 'user_id',     '' )
     session.pop( 'signin',   False )
     
     # Clear cookie then redirect to sign in page.
     resp =make_response( redirect( url_base + '/signin' ) )
-    resp.set_cookie( 'login_id', None )
-    resp.set_cookie( 'password', None )
+    resp.set_cookie( 'login_id', '' )
+    resp.set_cookie( 'token',    '' )
 
     return resp
     
@@ -243,6 +267,8 @@ def top():
 @application.route('/profile_edit', methods=['GET', 'POST'])
 def prof_edit():
 
+    pass
+
     if request.method == 'GET':
         # Show profile edit page.
         return render_template( 'profile_edit.html' )
@@ -260,7 +286,7 @@ def prof_edit():
         return render_template( 'error.html', message='パスワードが一致していません。' )
 
     if len(new_pw1) != 0:
-        sql = 'update password 
+        sql = 'update password '
     
     print(username)
     print(new_pw1)
