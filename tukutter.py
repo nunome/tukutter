@@ -1,11 +1,10 @@
 from datetime import datetime
-import os
 from flask import Flask, request, render_template, redirect, session, url_for, make_response
-import MySQLdb
+import MySQLdb, os, random, string
 
 application = Flask(__name__)
 
-application.secret_key = os.urandom(24)
+application.secret_key = os.urandom(64)
 
 url_base = 'http://localhost:8080'
 
@@ -29,10 +28,10 @@ def publish_cookie( link_to, login_id ):
     resp = make_response( redirect(link_to) )
 
     # Publish token.
-    token = os.urandom(24)
+    token = ''.join(random.choice(string.ascii_letters+string.digits) for i in range(128))
 
     # Store token.
-    db = connect_db
+    db = connect_db()
     connect = db.cursor()
 
     sql = 'update user set token = %s where login_id = %s'
