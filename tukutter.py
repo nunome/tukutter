@@ -218,6 +218,20 @@ def signout():
 
     global url_base
 
+    # Clear token at database.
+
+    # Connect database.
+    db = connect_db()
+    connect = db.cursor()
+
+    sql = 'update user set token = '''' where id = %s'
+    connect.execute( sql, [session['user_id']] )
+    db.commit()
+    
+    # Disconnect form database.
+    db.close()
+    connect.close()
+    
     # Close session.
     session.pop( 'username',    '' )
     session.pop( 'user_id',     '' )
