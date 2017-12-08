@@ -224,7 +224,7 @@ def signout():
     db = connect_db()
     connect = db.cursor()
 
-    sql = 'update user set token = '''' where id = %s'
+    sql = 'update user set token = \'\' where id = %s'
     connect.execute( sql, [session['user_id']] )
     db.commit()
     
@@ -280,8 +280,6 @@ def top():
     
 @application.route('/profile_edit', methods=['GET', 'POST'])
 def prof_edit():
-
-    pass
 
     if request.method == 'GET':
         # Show profile edit page.
