@@ -15,8 +15,8 @@ application.config['UPLOAD_FOLDER'] = upload_folder
 # Connect to database.
 def connect_db():
     
-    db = MySQLdb.connect( user='root', passwd='YutaOkinawa1211', host='localhost', db='tukutter', charset='utf8')
-    return db
+    conn = MySQLdb.connect( user='root', passwd='YutaOkinawa1211', host='localhost', db='tukutter', charset='utf8')
+    return conn
 
 # Publish session ID.
 def publish_session( user_id, username, signin ):
@@ -35,16 +35,16 @@ def publish_cookie( link_to, login_id ):
     token = ''.join(random.choice(string.ascii_letters+string.digits) for i in range(128))
 
     # Store token.
-    db = connect_db()
-    connect = db.cursor()
+    conn = connect_db()
+    curs = conn.cursor()
 
     sql = 'update user set token = %s where login_id = %s'
-    connect.execute( sql, [token, login_id] )
-    db.commit()
+    curs.execute( sql, [token, login_id] )
+    conn.commit()
 
     # Disconnect form database.
-    db.close()
-    connect.close()    
+    conn.close()
+    curs.close()    
     
     # Set cookie.
     max_age = 60*60*24 # 1day
@@ -92,17 +92,17 @@ def pre_request():
         cookie_token = request.cookies.get( 'token' )
 
         # Connect to database.
-        db = connect_db()
-        connect = db.cursor()
+        conn = connect_db()
+        curs = conn.cursor()
 
         # Find the user's id, username, and password.
         sql = 'select id, username, token from user where active_flg = 1 and login_id = %s'
-        connect.execute( sql, [cookie_lid] )
-        result = connect.fetchall()
+        curs.execute( sql, [cookie_lid] )
+        result = curs.fetchall()
 
         # Disconnect form database.
-        db.close()
-        connect.close()
+        conn.close()
+        curs.close()
         
         user_id  = result[0][0]
         username = result[0][1]
@@ -148,18 +148,18 @@ def signup():
         return render_template( 'error.html', message='パスワードが一致していません。' )
 
     # Connect to database.
-    db = connect_db()
-    connect = db.cursor()
+    conn = connect_db()
+    curs = conn.cursor()
 
     # Add new user to "user" table.
     sql = 'insert into user( login_id, password, username ) value ( %s, %s, %s )'
-    connect.execute( sql, [ login_id, password, username ] )
-    db.commit()
+    curs.execute( sql, [ login_id, password, username ] )
+    conn.commit()
     
     # Get user_ID from SQL server.
     sql = 'select id from user where active_flg = 1 and login_id = %s'
-    connect.execute( sql, [login_id] )
-    user_id = connect.fetchall()[0][0]
+    curs.execute( sql, [login_id] )
+    user_id = curs.fetchall()[0][0]
     
     # Publish session ID.
     publish_session( user_id, username, True )
@@ -168,8 +168,8 @@ def signup():
     resp = publish_cookie( url_base+'/top', login_id )
     
     # Disconnect form database.
-    db.close()
-    connect.close()
+    conn.close()
+    curs.close()
 
     return resp
 
@@ -190,17 +190,17 @@ def signin():
     in_pw    = request.form['password']
     
     # Connect to database.
-    db = connect_db()
-    connect = db.cursor()
+    conn = connect_db()
+    curs = conn.cursor()
 
     # Find the user's id, username, and password.
     sql = 'select id, username, password from user where active_flg = 1 and login_id = %s'
-    connect.execute( sql, [login_id] )
-    result = connect.fetchall()
+    curs.execute( sql, [login_id] )
+    result = curs.fetchall()
 
     # Disconnect form database.
-    db.close()
-    connect.close()
+    conn.close()
+    curs.close()
     
     # [Not equiped] If login_id is not found, show error page.
     
@@ -229,16 +229,16 @@ def signout():
     # Clear token at database.
 
     # Connect database.
-    db = connect_db()
-    connect = db.cursor()
+    conn = connect_db()
+    curs = conn.cursor()
 
     sql = 'update user set token = \'\' where id = %s'
-    connect.execute( sql, [session['user_id']] )
-    db.commit()
+    curs.execute( sql, [session['user_id']] )
+    conn.commit()
     
     # Disconnect form database.
-    db.close()
-    connect.close()
+    conn.close()
+    curs.close()
     
     # Close session.
     session.pop( 'username',    '' )
@@ -279,27 +279,24 @@ def prof_edit():
         return render_template( 'error.html', message='パスワードが一致していません。' )
 
     # Connect database.
-    db = connect_db()
-    connect = db.cursor()
+    conn = connect_db()
+    curs = conn.cursor()
 
     # Change password.
     if new_pw1:
         sql = 'update user set password = %s where id = %s'
-        connect.execute( sql, [new_pw1, user_id] )
-        db.commit()
+        curs.execute( sql, [new_pw1, user_id] )
 
     # Change username.
     if username:
         sql = 'update user set username = %s where id = %s'
-        connect.execute( sql, [username, user_id] )
-        db.commit()
+        curs.execute( sql, [username, user_id] )
         session.pop['username', username]
         
     # Change profile.
     if profile:
         sql = 'update user set profile = %s where id = %s'
-        connect.execute( sql, [profile, user_id] )
-        db.commit()
+        curs.execute( sql, [profile, user_id] )
     
     # Upload profile image.
     if img_file and allowed_file(img_file.filename):
@@ -307,12 +304,14 @@ def prof_edit():
         img_file.save( os.path.join(application.config['UPLOAD_FOLDER'], filename) )
 
         sql = 'update user set prof_pict = %s where id = %s'
-        connect.execute( sql, [upload_folder[1:]+'/'+filename, user_id] )
-        db.commit()
-        
+        curs.execute( sql, [upload_folder[1:]+'/'+filename, user_id] )
+
+    # Commit connect.
+    conn.commit()
+    
     # Disconnect from database.
-    db.close()
-    connect.close()
+    conn.close()
+    curs.close()
     
     return redirect( url_base + '/profile/' + username )
 
@@ -325,13 +324,13 @@ def top():
     username = session['username']
                      
     # Connect to database.
-    db = connect_db()
-    connect = db.cursor()
+    conn = connect_db()
+    curs = conn.cursor()
 
     # Get user's profile info includes image.
     sql = 'select prof_pict, username from user where id = %s'
-    connect.execute( sql, [user_id] )
-    user = connect.fetchall()
+    curs.execute( sql, [user_id] )
+    user = curs.fetchall()
     
     # Get tweets.
     sql = ( 'select user.prof_pict, user.username, tweet.time, tweet.content ' +
@@ -341,12 +340,12 @@ def top():
             'where follow.follower_id = %s ' +
             'order by tweet.time desc' )
     
-    connect.execute( sql, [user_id] )    
-    tweets = connect.fetchall()
+    curs.execute( sql, [user_id] )    
+    tweets = curs.fetchall()
 
     # Disconnect form database.
-    db.close()
-    connect.close()
+    conn.close()
+    curs.close()
 
     return render_template( 'index.html', user=user, tweets=tweets )
     
