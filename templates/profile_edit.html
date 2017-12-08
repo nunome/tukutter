@@ -10,10 +10,10 @@
   <div class="logo">
     <p>プロフィール編集</p>
   </div>
-  <form action="/profile_edit" method="post">
+  <form action="/profile_edit" method="post" enctype="multipart/form-data">
     <div class="inline">
       <label for="userid">image</label>
-      <input id="file" class="file" type="file" name="file" value="">
+      <input id="file" class="file" type="file" name="img_file" value="">
               <!-- <label for="file" class="view_box">
           +画像を選択
           <input id="file" class="file" type="file" name="file" value="" style="display:none;">

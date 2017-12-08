@@ -1,12 +1,16 @@
 from datetime import datetime
 from flask import Flask, request, render_template, redirect, session, url_for, make_response
+from werkzeug import secure_filename
 import MySQLdb, os, random, string
 
-application = Flask(__name__)
-
-application.secret_key = os.urandom(64)
 
 url_base = 'http://localhost:8080'
+upload_folder = './static/img'
+allowed_extensions = set(['png', 'jpg'])
+
+application = Flask(__name__)
+application.secret_key = os.urandom(64)
+application.config['UPLOAD_FOLDER'] = upload_folder
 
 # Connect to database.
 def connect_db():
@@ -54,6 +58,11 @@ def publish_cookie( link_to, login_id ):
     resp.set_cookie( 'token', token, max_age, expires )
     
     return resp
+
+# Check image file extension.
+def allowed_file(filename):
+    return '.' in filename and \
+        filename.rsplit('.', 1)[1] in allowed_extensions
 
 # Run this process before every route() function.
 @application.before_request
@@ -242,7 +251,71 @@ def signout():
     resp.set_cookie( 'token',    '' )
 
     return resp
+
+# Edit profile.
+@application.route('/profile_edit', methods=['GET', 'POST'])
+def prof_edit():
+
+    global url_base, upload_folder
     
+    if request.method == 'GET':
+        # Show profile edit page.
+        return render_template( 'profile_edit.html' )
+    
+    user_id  = session['user_id']
+    
+    # Get new user's value from web form.
+    login_id = request.form['login_id']
+    new_pw1  = request.form['password']
+    new_pw2  = request.form['conf_password']
+    username = request.form['username']
+    profile  = request.form['profile']
+    img_file = request.files['img_file']
+    
+    if login_id:
+        return render_template( 'error.html', message='login_id は変更できません。' )
+    
+    if new_pw1 != new_pw2:
+        return render_template( 'error.html', message='パスワードが一致していません。' )
+
+    # Connect database.
+    db = connect_db()
+    connect = db.cursor()
+
+    # Change password.
+    if new_pw1:
+        sql = 'update user set password = %s where id = %s'
+        connect.execute( sql, [new_pw1, user_id] )
+        db.commit()
+
+    # Change username.
+    if username:
+        sql = 'update user set username = %s where id = %s'
+        connect.execute( sql, [username, user_id] )
+        db.commit()
+        session.pop['username', username]
+        
+    # Change profile.
+    if profile:
+        sql = 'update user set profile = %s where id = %s'
+        connect.execute( sql, [profile, user_id] )
+        db.commit()
+    
+    # Upload profile image.
+    if img_file and allowed_file(img_file.filename):
+        filename = secure_filename(img_file.filename)
+        img_file.save( os.path.join(application.config['UPLOAD_FOLDER'], filename) )
+
+        sql = 'update user set prof_pict = %s where id = %s'
+        connect.execute( sql, [upload_folder[1:]+'/'+filename, user_id] )
+        db.commit()
+        
+    # Disconnect from database.
+    db.close()
+    connect.close()
+    
+    return redirect( url_base + '/profile/' + username )
+
 # Show top menu.
 @application.route('/top')
 def top():
@@ -277,30 +350,3 @@ def top():
 
     return render_template( 'index.html', user=user, tweets=tweets )
     
-@application.route('/profile_edit', methods=['GET', 'POST'])
-def prof_edit():
-
-    if request.method == 'GET':
-        # Show profile edit page.
-        return render_template( 'profile_edit.html' )
-
-    user_id  = session['user_id']
-    username = session['username']
-    
-    # Get new user's value from web form.
-     # login_id = request.form['login_id']
-    new_pw1  = request.form['password']
-    new_pw2  = request.form['conf_password']
-    username = request.form['username']
-
-    if new_pw1 != new_pw2:
-        return render_template( 'error.html', message='パスワードが一致していません。' )
-
-    if len(new_pw1) != 0:
-        sql = 'update password '
-    
-    print(username)
-    print(new_pw1)
-    
-    return render_template( 'profile.html' )
-
