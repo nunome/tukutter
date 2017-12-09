@@ -6,7 +6,7 @@ import MySQLdb, os, random, string
 
 url_base = 'http://localhost:8080'
 upload_folder = './static/img'
-allowed_extensions = set(['png', 'jpg'])
+allowed_extensions = set(['png','jpg'])
 
 application = Flask(__name__)
 application.secret_key = os.urandom(64)
@@ -16,8 +16,22 @@ application.config['UPLOAD_FOLDER'] = upload_folder
 def connect_db():
     
     conn = MySQLdb.connect( user='root', passwd='YutaOkinawa1211', host='localhost', db='tukutter', charset='utf8')
-    return conn
+    curs = conn.cursor()
+    
+    return ( conn, curs )
 
+# Get user info.
+def get_user( conn, curs ):
+
+    user_id = session['user_id']
+    
+    # Get user's profile info includes image.
+    sql = 'select prof_pict, username from user where id = %s'
+    curs.execute( sql, [user_id] )
+    user = curs.fetchall()
+
+    return user
+    
 # Publish session ID.
 def publish_session( user_id, username, signin ):
 
@@ -35,8 +49,7 @@ def publish_cookie( link_to, login_id ):
     token = ''.join(random.choice(string.ascii_letters+string.digits) for i in range(128))
 
     # Store token.
-    conn = connect_db()
-    curs = conn.cursor()
+    conn, curs = connect_db()
 
     sql = 'update user set token = %s where login_id = %s'
     curs.execute( sql, [token, login_id] )
@@ -92,8 +105,7 @@ def pre_request():
         cookie_token = request.cookies.get( 'token' )
 
         # Connect to database.
-        conn = connect_db()
-        curs = conn.cursor()
+        conn, curs = connect_db()
 
         # Find the user's id, username, and password.
         sql = 'select id, username, token from user where active_flg = 1 and login_id = %s'
@@ -148,8 +160,7 @@ def signup():
         return render_template( 'error.html', message='パスワードが一致していません。' )
 
     # Connect to database.
-    conn = connect_db()
-    curs = conn.cursor()
+    conn, curs = connect_db()
 
     # Add new user to "user" table.
     sql = 'insert into user( login_id, password, username ) value ( %s, %s, %s )'
@@ -190,8 +201,7 @@ def signin():
     in_pw    = request.form['password']
     
     # Connect to database.
-    conn = connect_db()
-    curs = conn.cursor()
+    conn, curs = connect_db()
 
     # Find the user's id, username, and password.
     sql = 'select id, username, password from user where active_flg = 1 and login_id = %s'
@@ -229,8 +239,7 @@ def signout():
     # Clear token at database.
 
     # Connect database.
-    conn = connect_db()
-    curs = conn.cursor()
+    conn, curs = connect_db()
 
     sql = 'update user set token = \'\' where id = %s'
     curs.execute( sql, [session['user_id']] )
@@ -279,8 +288,7 @@ def prof_edit():
         return render_template( 'error.html', message='パスワードが一致していません。' )
 
     # Connect database.
-    conn = connect_db()
-    curs = conn.cursor()
+    conn, curs = connect_db()
 
     # Change password.
     if new_pw1:
@@ -324,13 +332,10 @@ def top():
     username = session['username']
                      
     # Connect to database.
-    conn = connect_db()
-    curs = conn.cursor()
+    conn, curs = connect_db()
 
     # Get user's profile info includes image.
-    sql = 'select prof_pict, username from user where id = %s'
-    curs.execute( sql, [user_id] )
-    user = curs.fetchall()
+    user = get_user( conn, curs )
     
     # Get tweets.
     sql = ( 'select user.prof_pict, user.username, tweet.time, tweet.content ' +
@@ -369,13 +374,10 @@ def profile(in_name):
     username = session['username']
         
     # Connect to database.
-    conn = connect_db()
-    curs = conn.cursor()
+    conn, curs = connect_db()
 
     # Get user's profile info includes image.
-    sql = 'select prof_pict, username from user where id = %s'
-    curs.execute( sql, [user_id] )
-    user = curs.fetchall()
+    user = get_user( conn, curs )
     
     # Get requested user's profile and tweets.
     sql = 'select prof_pict, username, profile, id from user where username = %s'
@@ -412,13 +414,10 @@ def tweet():
     username = session['username']
                      
     # Connect to database.
-    conn = connect_db()
-    curs = conn.cursor()
+    conn, curs = connect_db()
 
     # Get user's profile info includes image.
-    sql = 'select prof_pict, username from user where id = %s'
-    curs.execute( sql, [user_id] )
-    user = curs.fetchall()
+    user = get_user( conn, curs )
 
     # Show tweet form page.
     if request.method == 'GET':
@@ -447,7 +446,26 @@ def tweet_edit(tweet_id):
     pass
 
 # Search words in tweet.
-@application.route('/search', methods=['GET', 'POST'])
+@application.route('/search', methods=['GET','POST'])
 def search():
 
     global url_base
+
+    # Get search word from the form.
+    word = request.form['word']
+    
+    # Connect database.
+    conn, curs = connect_db()
+
+    # Get tweets including search word.
+    sql = ( 'select user.prof_pict, user.username, tweet.time, tweet.content ' +
+            'from user ' +
+            'inner join tweet on tweet.user_id = user.id ' +
+            'where tweet.content like %%s%' )
+    curs.execute( sql, [word] )
+    tweets = curs.fetchall()
+
+    
+
+
+
