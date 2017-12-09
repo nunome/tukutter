@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+
+{% block css %}profile{% endblock %}
+
+{% block script %}
+<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="../static/js/profile.js"></script>
+{% endblock %}
+
+{% block title %}profile{% endblock %}
+
+{% block body %}
+<main id="profile">
+  <header>
+    <div class="profile">
+      <img src={{user[0][0]}} alt="">
+      <p>user[0][1]</p>
+    </div>
+    <nav>
+      <ul>
+	<li><a href="/top">top</a></li>
+	<li><a href="/search">検索</a></li>
+	<li><a href="/tweet">つぶやく</a></li>
+	<li><a href="/favorite">お気に入り</a></li>
+	<li><a href="/logout">ログアウト</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="profilecard">
+    <div class="profile-header">
+      <img src={{disp_user[0][0]}} alt="">
+      <p><span class="user-name">{{disp_user[0][1]}}</span><a href="#"><img class="edit" src="../static/img/pencil.png" alt=""></a></p>
+    </div>
+    <div class="profile-content">
+      <p>{{disp_user[0][2]}}</p>
+    </div>
+  </div>
+  
+{% for tweet in tweets %}
+  
+  

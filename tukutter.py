@@ -349,6 +349,14 @@ def top():
 
     return render_template( 'index.html', user=user, tweets=tweets )
 
+@application.route('/profile/<in_name>')
+def profile(in_name):
+    
+    global url_base
+
+    
+    
+
 @application.route('/tweet', methods=['GET', 'POST'])
 def tweet():
 
