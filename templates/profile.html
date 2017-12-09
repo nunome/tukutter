@@ -13,8 +13,8 @@
 <main id="profile">
   <header>
     <div class="profile">
-      <img src={{user[0][0]}} alt="">
-      <p>user[0][1]</p>
+      <a href="/profile"><img src={{user[0][0]}} alt=""></a>
+      <a href="/profile"><p>{{user[0][1]}}</p></a>
     </div>
     <nav>
       <ul>
@@ -22,7 +22,7 @@
 	<li><a href="/search">検索</a></li>
 	<li><a href="/tweet">つぶやく</a></li>
 	<li><a href="/favorite">お気に入り</a></li>
-	<li><a href="/logout">ログアウト</a></li>
+	<li><a href="/signout">ログアウト</a></li>
       </ul>
     </nav>
   </header>
@@ -30,13 +30,46 @@
   <div class="profilecard">
     <div class="profile-header">
       <img src={{disp_user[0][0]}} alt="">
-      <p><span class="user-name">{{disp_user[0][1]}}</span><a href="#"><img class="edit" src="../static/img/pencil.png" alt=""></a></p>
+      <p><span class="user-name">{{disp_user[0][1]}}</span>
+	{% if session.username == disp_user[0][1] %}
+	<a href="/profile_edit"><img class="edit" src="../static/img/pencil.png" alt=""></a></p>
+        {% else %}
+      <!-- フォロー中のボタンがいる --></p>
+        {% endif %}
     </div>
     <div class="profile-content">
       <p>{{disp_user[0][2]}}</p>
+      <!-- フォロー中かどうかの表示が必要 -->
     </div>
   </div>
-  
+
+  <div class="stream">
+    
 {% for tweet in tweets %}
-  
-  
+  <div class="content">
+    <div class="stream-header">
+      <img src={{tweet[0]}} alt="">
+      <p>
+        <span class="user-name">{{tweet[1]}}</span>
+        <span class="tweet-time">{{tweet[2]}}</span>
+	{% if tweet[1] == session.username %}
+	<a href="/tweet/edit/{{tweet[4]}}"><img class="edit" src="../static/img/pencil.png" alt=""></a>
+	{% endif %}
+        <!-- <span class="follow">フォロー中</span> プロフィールのtweetにはフォロー中いらない-->
+      </p>
+    </div>
+    <div class="inline">
+      <div class="stream-content">
+        <p>{{tweet[3]}}</p>
+      </div>
+      <div class="stream-footer">
+        <div class="favorite">
+	  <a href="/favorite"><img src="../static/img/logo-pic.png" alt=""></a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endfor %}
+  </div>
+</main>
+{% endblock %}

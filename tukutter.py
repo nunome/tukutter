@@ -313,7 +313,7 @@ def prof_edit():
     conn.close()
     curs.close()
     
-    return redirect( url_base + '/profile/' + username )
+    return redirect( url_base + '/profile/' + session['username'] )
 
 # Show top menu.
 @application.route('/top')
@@ -349,12 +349,57 @@ def top():
 
     return render_template( 'index.html', user=user, tweets=tweets )
 
+# Show profile page.
+@application.route('/profile')
+def redirect_profile():
+
+    global url_base
+    
+    return redirect( url_base + '/profile/' + session['username'] )
+    
 @application.route('/profile/<in_name>')
 def profile(in_name):
+
+    ## [Need to handle when in_name is empty.]
     
     global url_base
-
     
+    # Get login user's value from session.
+    user_id  = session['user_id']
+    username = session['username']
+        
+    # Connect to database.
+    conn = connect_db()
+    curs = conn.cursor()
+
+    # Get user's profile info includes image.
+    sql = 'select prof_pict, username from user where id = %s'
+    curs.execute( sql, [user_id] )
+    user = curs.fetchall()
+    
+    # Get requested user's profile and tweets.
+    sql = 'select prof_pict, username, profile, id from user where username = %s'
+    curs.execute( sql, [in_name] )
+    disp_user = curs.fetchall()
+
+    sql = ( 'select user.prof_pict, user.username, tweet.time, tweet.content, tweet.id ' +
+            'from user ' +
+            'inner join tweet on tweet.user_id = user.id ' +
+            'where tweet.user_id = %s ' +
+            'order by tweet.time desc' )
+    curs.execute( sql, [disp_user[0][3]] )
+    tweets = curs.fetchall()
+
+    # Disconnect from database.
+    conn.close()
+    curs.close()
+
+    ## [Need to add function to distingush follow or not and requested user is as signin user or not]
+    ## In case of requested to show signin user.
+    # if in_name == username:
+        ## Jump as login user.
+        
+    return render_template( 'profile.html', user=user, disp_user=disp_user, tweets=tweets )
     
 
 @application.route('/tweet', methods=['GET', 'POST'])
@@ -383,8 +428,8 @@ def tweet():
     # Get tweet content.
     tweet = request.form['tweet']
 
-    # Update tweet.
-    sql = 'update tweet set content = %s where user_id = %s'
+    # Insert new tweet.
+    sql = 'insert into tweet(content, user_id) values(%s,%s)'
     curs.execute( sql, [tweet, user_id] )
     conn.commit()
 
@@ -393,7 +438,7 @@ def tweet():
     curs.close()
 
     # Redirect to profile page.
-    return redirect( 'url_base' + '/profile/' + username )
+    return redirect( url_base + '/profile/' + username )
 
 
 

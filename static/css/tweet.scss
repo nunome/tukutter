@@ -1,9 +1,137 @@
 #tweet {
+  header {
+    background-color: #f7b52c;
+
+    .profile {
+      display: inline-block;
+      width: 100%;
+
+      img {
+        position: absolute;
+        width: 6%;
+        margin: 1vw 1vw;
+      }
+      p {
+        font-size: 8vw;
+        text-align: center;
+      }
+
+    }
+
+    nav {
+      ul {
+        border: solid 1px;
+        background-color: #EEEEEE;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+
+        li {
+          text-align: center;
+
+          a {
+            display: inline-block;
+            padding: 0.7vw 0;
+            width: 10vw;
+            font-size: 1.1vw;
+          }
+          a:hover {
+            text-decoration: none;
+          }
+        }
+        li:hover {
+          background-color: #EEEEEE;
+          filter: brightness(80%);
+        }
+      }
+      ul.fixed {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        padding-top: 8px;
+      }
+    }
+  }
+
+  .tweet {
+    width: 38vw;
+    margin:5vw auto;
+    border: solid 5px #f7b52c;
+    background-color: #EEEEEE;
+    padding: 1vw;
+
+    form.tweet-form {
+      color: #707070;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
+      textarea {
+        width: 37vw;
+        height: 11vw;
+        font-size: 2vw;
+      }
+      input[type="submit"] {
+        margin-top: 1vw;
+        border: none;
+        font-size: 1.5vw;
+        padding: 0.2vw 0.9vw;
+        border-radius: 0;
+        background-color: #B9DCF2;
+        color: #707070;
+      }
+    }
+  }
 
 }
 
 @media (max-width:599px) {
   #tweet {
+    header {
+      .profile {
+        height: 20vw;
+
+        img {
+          width: 17%;
+          margin: 1.5vw;
+        }
+        p {
+          font-size: 18vw;
+        }
+      }
+      nav {
+        ul {
+          li {
+            width: 20%;
+            a {
+              display: inline-block;
+              width: 90%;
+              padding: 2vw 0;
+              font-size: 3vw;
+            }
+          }
+        }
+      }
+    }
+
+    .tweet {
+      width: 90vw;
+
+      form.tweet-form {
+        textarea {
+          width: 87vw;
+          height: 35vw;
+          font-size: 6vw;
+        }
+        input[type="submit"] {
+          margin: 3vw;
+          margin-left: auto;
+          padding: 2vw;
+          font-size: 5vw;
+        }
+      }
+    }
 
   }
 }
