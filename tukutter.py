@@ -440,5 +440,14 @@ def tweet():
     # Redirect to profile page.
     return redirect( url_base + '/profile/' + username )
 
+# Edit tweet.
+@application.route('/tweet_edit/<tweet_id>')
+def tweet_edit(tweet_id):
 
+    pass
 
+# Search words in tweet.
+@application.route('/search', methods=['GET', 'POST'])
+def search():
+
+    global url_base
