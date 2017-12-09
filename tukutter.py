@@ -74,7 +74,7 @@ def pre_request():
     if session.get('signin'):
         return
     
-    # No check if sign in page is requested.
+    # No check if sign in/up/out page is requested.
     if request.path == '/signin' or \
        request.path == '/signup' or \
        request.path == '/signout':
@@ -117,7 +117,7 @@ def pre_request():
 
         else:
             # Redirect to sign in page.
-            return redirect( url_base + url_login )
+            return redirect( url_base + '/sign' )
 
 # Redirect access from root to sign in page.
 @application.route('/')
@@ -125,8 +125,8 @@ def root_access():
 
     global url_base
     
-    # Redirect to login page.
-    return redirect( url_base+'/top' )
+    # Redirect to signin page.
+    return redirect( url_base + '/signin' )
 
 # Add new user.
 @application.route('/signup', methods=['POST','GET'])
@@ -246,7 +246,7 @@ def signout():
     session.pop( 'signin',   False )
     
     # Clear cookie then redirect to sign in page.
-    resp =make_response( redirect( url_base + '/signin' ) )
+    resp = make_response( redirect( url_base + '/signin' ) )
     resp.set_cookie( 'login_id', '' )
     resp.set_cookie( 'token',    '' )
 
@@ -343,9 +343,49 @@ def top():
     curs.execute( sql, [user_id] )    
     tweets = curs.fetchall()
 
-    # Disconnect form database.
+    # Disconnect from database.
     conn.close()
     curs.close()
 
     return render_template( 'index.html', user=user, tweets=tweets )
-    
+
+@application.route('/tweet', methods=['GET', 'POST'])
+def tweet():
+
+    global url_base
+
+    # Get login user's value from session.
+    user_id  = session['user_id']
+    username = session['username']
+                     
+    # Connect to database.
+    conn = connect_db()
+    curs = conn.cursor()
+
+    # Get user's profile info includes image.
+    sql = 'select prof_pict, username from user where id = %s'
+    curs.execute( sql, [user_id] )
+    user = curs.fetchall()
+
+    # Show tweet form page.
+    if request.method == 'GET':
+        # Show profile edit page.
+        return render_template( 'tweet.html', user=user )
+
+    # Get tweet content.
+    tweet = request.form['tweet']
+
+    # Update tweet.
+    sql = 'update tweet set content = %s where user_id = %s'
+    curs.execute( sql, [tweet, user_id] )
+    conn.commit()
+
+    # Disconnect from database.
+    conn.close()
+    curs.close()
+
+    # Redirect to profile page.
+    return redirect( 'url_base' + '/profile/' + username )
+
+
+

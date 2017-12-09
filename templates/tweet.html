@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+
+{% block css %}tweet{% endblock %}
+
+{% block title %}tweet{% endblock %}
+
+{% block body %}
+ <main id="tweet">
+    <header>
+      <div class="profile">
+        <img src={{user[0][0]}} alt="">
+        <p>{{user[0][1]}}</p>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="/top">top</a></li>
+          <li><a href="/search">検索</a></li>
+          <li><a href="/tweet">つぶやく</a></li>
+          <li><a href="favorite">お気に入り</a></li>
+          <li><a href="/signout">ログアウト</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <div class="tweet">
+      <form class="tweet-form" action="/tweet" method="post">
+        <textarea name="tweet"></textarea>
+        <input type="submit" name="submit" value="つぶやく">
+      </form>
+    </div>
+
+  </main>
+{% endblock %}
