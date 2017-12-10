@@ -450,22 +450,30 @@ def tweet_edit(tweet_id):
 def search():
 
     global url_base
-
-    # Get search word from the form.
-    word = request.form['word']
-    
+            
     # Connect database.
     conn, curs = connect_db()
 
+    # Get user info.
+    user = get_user( conn, curs )
+
+    if request.method == 'GET':
+        return render_template( 'search.html', user=user, tweets='' )
+
+    # Get search word from the form.
+    word = request.form['word']
+
+    print(word)
     # Get tweets including search word.
     sql = ( 'select user.prof_pict, user.username, tweet.time, tweet.content ' +
             'from user ' +
             'inner join tweet on tweet.user_id = user.id ' +
-            'where tweet.content like %%s%' )
-    curs.execute( sql, [word] )
+            'where tweet.content like %s ' +
+            'order by tweet.time desc' )
+    curs.execute( sql, [('%'+word+'%')] )
     tweets = curs.fetchall()
 
-    
-
+    print(tweets)
+    return render_template( 'search.html', user=user, tweets=tweets )
 
 
