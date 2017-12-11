@@ -1,16 +1,11 @@
 {% extends "layout.html" %}
 
-{% block css %}search{% endblock %}
+{% block css %}favorite{% endblock %}
 
-{% block script %}
-<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-<script type="text/javascript" src="../static/js/index.js"></script>
-{% endblock %}
-
-{% block title %}search{% endblock %}
+{% block title %}お気に入り{% endblock %}
 
 {% block body %}
-<main id="search">
+<main id="favorite">
   <header>
     <div class="profile">
       <a href="/profile"><img src={{user[0][0]}} alt=""></a>
@@ -27,13 +22,6 @@
     </nav>
   </header>
 
-  <div class="search">
-    <form class="search-form" action="/search" method="post">
-      <input class="search-input" type="text" name="word" value="">
-      <input type="submit" name="submit" value="検索">
-    </form>
-  </div>
-
   <div class="stream">
     {% if tweets %}
     {% for tweet in tweets %}
@@ -43,7 +31,7 @@
 	<p>
 	  <a href="/profile/{{tweet[1]}}"><span class="user-name">{{tweet[1]}}</span></a>
 	  <span class="tweet-time">{{tweet[2]}}</span>
-	  <span class="follow"><a href="/follow/{{tweet[5]}}">{% if tweet[6] == '1' %}フォロー中{% else %}フォローする{% endif %}</a></span>
+	  <span class="follow">フォロー中</span>
 	</p>
       </div>
       <div class="inline">
@@ -52,7 +40,7 @@
 	</div>
 	<div class="stream-footer">
 	  <div class="favorite">
-	    <a href="/favorite/{{tweet[4]}}"><img src="../static/img/logo-pic.png" alt=""></a>
+	    <a href="/favorite"><img src="../static/img/logo-pic.png" alt=""></a>
 	  </div>
 	</div>
       </div>
@@ -62,5 +50,3 @@
   </div>
 </main>
 {% endblock %}
-
-    

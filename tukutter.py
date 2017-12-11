@@ -338,11 +338,11 @@ def top():
     user = get_user( conn, curs )
     
     # Get tweets.
-    sql = ( 'select user.prof_pict, user.username, tweet.time, tweet.content ' +
+    sql = ( 'select user.prof_pict, user.username, tweet.time, tweet.content, tweet.id, user.id ' +
             'from follow ' +
             'inner join tweet on follow.user_id = tweet.user_id ' +
             'inner join user on user.id = tweet.user_id ' +
-            'where follow.follower_id = %s ' +
+            'where follow.follower_id = %s and follow.active_flg = 1 ' +
             'order by tweet.time desc' )
     
     curs.execute( sql, [user_id] )    
@@ -404,7 +404,7 @@ def profile(in_name):
     return render_template( 'profile.html', user=user, disp_user=disp_user, tweets=tweets )
     
 
-@application.route('/tweet', methods=['GET', 'POST'])
+@application.route('/tweet', methods=['GET','POST'])
 def tweet():
 
     global url_base
@@ -436,6 +436,7 @@ def tweet():
     conn.close()
     curs.close()
 
+    print(request.referrer)
     # Redirect to profile page.
     return redirect( url_base + '/profile/' + username )
 
@@ -448,8 +449,6 @@ def tweet_edit(tweet_id):
 # Search words in tweet.
 @application.route('/search', methods=['GET','POST'])
 def search():
-
-    global url_base
             
     # Connect database.
     conn, curs = connect_db()
@@ -463,17 +462,137 @@ def search():
     # Get search word from the form.
     word = request.form['word']
 
-    print(word)
     # Get tweets including search word.
-    sql = ( 'select user.prof_pict, user.username, tweet.time, tweet.content ' +
+    sql = ( 'select user.prof_pict, user.username, tweet.time, tweet.content, tweet.id, ' +
+            'user.id, bin(follow.active_flg) ' +
             'from user ' +
             'inner join tweet on tweet.user_id = user.id ' +
-            'where tweet.content like %s ' +
+            'inner join follow on follow.user_id = tweet.user_id ' +
+            'where tweet.content like %s and follow.follower_id = %s and tweet.active_flg = 1 ' +
             'order by tweet.time desc' )
-    curs.execute( sql, [('%'+word+'%')] )
+    curs.execute( sql, [ ('%'+word+'%'), session['user_id'] ] )
     tweets = curs.fetchall()
 
-    print(tweets)
+    for tweet in tweets:
+        print(isinstance(tweet[6],str))
+        
     return render_template( 'search.html', user=user, tweets=tweets )
 
+# Show favorite page.
+@application.route('/favorite')
+def favorite():
+
+    global url_base
+
+    # Get user_id from cookie.
+    user_id = session['user_id']
+    
+    # Connect databse.
+    conn, curs = connect_db()
+
+    # Get user info.
+    user = get_user( conn, curs )
+
+    # Get favorite tweet list.
+    sql = ( 'select user.prof_pict, user.username, tweet.time, tweet.content, tweet.id ' +
+            'from favorite ' +
+            'inner join tweet on favorite.tweet_id = tweet.id ' +
+            'inner join user on favorite.user_id = user.id ' +
+            'where favorite.user_id = %s and favorite.active_flg = 1' )
+    curs.execute( sql, [user_id] )
+    tweets = curs.fetchall()
+
+    return render_template( 'favorite.html', user=user, tweets=tweets )
+    
+    
+# Add/Cancel tweet as favorite.
+@application.route('/favorite/<tid>')
+def add_favorite( tid = None ):
+    
+    # Get user_id from cookie.
+    user_id  = session['user_id']    
+    
+    # Connect database.
+    conn, curs = connect_db()
+
+    # Check status.
+    sql = ( 'select id, active_flg ' +
+            'from favorite ' +
+            'where user_id = %s and tweet_id = %s' )
+    curs.execute( sql, [user_id, tid] )
+    tmp = curs.fetchall()
+
+    if tmp:
+        fid  = tmp[0][0]
+        fflg = ord(tmp[0][1])
+    
+    if not tmp:
+        sql = ( 'insert into favorite ' +
+                '(user_id, tweet_id) ' +
+                'values (%s, %s)' )
+        curs.execute( sql, [user_id, tid] )
+        conn.commit()
+
+    elif fflg == 1:
+        sql = ( 'update favorite ' +
+                'set active_flg = 0 ' +
+                'where id = %s' )
+        curs.execute( sql, [fid] )
+        conn.commit()
+
+    else:
+        sql = ( 'update favorite ' +
+                'set active_flg = 1 ' +
+                'where id = %s' )
+        curs.execute( sql, [fid] )
+        conn.commit()
+
+    # Return favorite page.
+    return redirect( request.referrer )
+
+# Follow user.
+@application.route('/follow/<fuid>')
+def follow( fuid = None ):
+
+    # Get user_id from cookie.
+    user_id  = session['user_id']    
+    
+    # Connect database.
+    conn, curs = connect_db()
+
+    # Check status.
+    sql = ( 'select id, active_flg ' +
+            'from follow ' +
+            'where follower_id = %s and user_id = %s' )
+    curs.execute( sql, [user_id, fuid] )
+    tmp = curs.fetchall()
+
+    if tmp:
+        fid  = tmp[0][0]
+        fflg = ord(tmp[0][1])
+    
+    if not tmp:
+        sql = ( 'insert into follow ' +
+                '(follower_id, user_id) ' +
+                'values (%s, %s)' )
+        curs.execute( sql, [user_id, fuid] )
+        conn.commit()
+
+    elif fflg == 1:
+        sql = ( 'update follow ' +
+                'set active_flg = 0 ' +
+                'where id = %s' )
+        curs.execute( sql, [fid] )
+        conn.commit()
+
+    else:
+        sql = ( 'update follow ' +
+                'set active_flg = 1 ' +
+                'where id = %s' )
+        curs.execute( sql, [fid] )
+        conn.commit()
+
+    # Return original page.
+    return redirect( request.referrer )
+    
 
