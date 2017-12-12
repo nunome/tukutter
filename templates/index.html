@@ -28,7 +28,8 @@
     </header>
     
     <div class="stream">
-{% for tweet in tweets %}
+    {% if tweets %}
+    {% for tweet in tweets %}
       <div class="content">
 	    <div class="stream-header">
 	      <a href="/profile/{{tweet[1]}}"><img src={{tweet[0]}} alt=""></a>
@@ -44,12 +45,13 @@
 	      </div>
 	      <div class="stream-footer">
 	        <div class="favorite">
-	          <a href="/favorite/{{tweet[4]}}"><img src="../static/img/logo-pic.png" alt=""></a>
+	          <a href="/favorite/{{tweet[4]}}"><img src="/static/img/logo-pic.png" alt=""></a>
 	        </div>
 	      </div>
 	    </div>
       </div>
 {% endfor %}
+{% endif %}
     </div>
   </main>
 {% endblock %}

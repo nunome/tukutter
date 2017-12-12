@@ -39,7 +39,7 @@
     {% for tweet in tweets %}
     <div class="content">
       <div class="stream-header">
-	<a href="/profile/{{tweet[1]}}"><img src={{user[0][0]}} alt=""></a>
+	<a href="/profile/{{tweet[1]}}"><img src={{tweet[0]}} alt=""></a>
 	<p>
 	  <a href="/profile/{{tweet[1]}}"><span class="user-name">{{tweet[1]}}</span></a>
 	  <span class="tweet-time">{{tweet[2]}}</span>

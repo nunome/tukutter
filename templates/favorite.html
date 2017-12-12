@@ -2,6 +2,11 @@
 
 {% block css %}favorite{% endblock %}
 
+{% block script %}
+<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="../static/js/index.js"></script>
+{% endblock %}
+
 {% block title %}お気に入り{% endblock %}
 
 {% block body %}
@@ -27,11 +32,11 @@
     {% for tweet in tweets %}
     <div class="content">
       <div class="stream-header">
-	<a href="/profile/{{tweet[1]}}"><img src={{user[0][0]}} alt=""></a>
+	<a href="/profile/{{tweet[1]}}"><img src={{tweet[0]}} alt=""></a>
 	<p>
 	  <a href="/profile/{{tweet[1]}}"><span class="user-name">{{tweet[1]}}</span></a>
 	  <span class="tweet-time">{{tweet[2]}}</span>
-	  <span class="follow">フォロー中</span>
+	  <span class="follow"><a href="/follow/{{tweet[5]}}">{% if tweet[6] == '1' %}フォロー中{% else %}フォローする{% endif %}</a></span>
 	</p>
       </div>
       <div class="inline">
@@ -40,7 +45,7 @@
 	</div>
 	<div class="stream-footer">
 	  <div class="favorite">
-	    <a href="/favorite"><img src="../static/img/logo-pic.png" alt=""></a>
+	    <a href="/favorite{{tweet[4]}}"><img src="../static/img/logo-pic.png" alt=""></a>
 	  </div>
 	</div>
       </div>

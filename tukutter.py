@@ -15,7 +15,8 @@ application.config['UPLOAD_FOLDER'] = upload_folder
 # Connect to database.
 def connect_db():
     
-    conn = MySQLdb.connect( user='root', passwd='YutaOkinawa1211', host='localhost', db='tukutter', charset='utf8')
+    conn = MySQLdb.connect( user='root', passwd='YutaOkinawa1211',
+                            host='localhost', db='tukutter', charset='utf8' )
     curs = conn.cursor()
     
     return ( conn, curs )
@@ -236,11 +237,10 @@ def signout():
 
     global url_base
 
-    # Clear token at database.
-
     # Connect database.
     conn, curs = connect_db()
 
+    # Clear token at database.
     sql = 'update user set token = \'\' where id = %s'
     curs.execute( sql, [session['user_id']] )
     conn.commit()
@@ -387,7 +387,7 @@ def profile(in_name):
     sql = ( 'select user.prof_pict, user.username, tweet.time, tweet.content, tweet.id ' +
             'from user ' +
             'inner join tweet on tweet.user_id = user.id ' +
-            'where tweet.user_id = %s ' +
+            'where tweet.user_id = %s and tweet.active_flg = 1 ' +
             'order by tweet.time desc' )
     curs.execute( sql, [disp_user[0][3]] )
     tweets = curs.fetchall()
@@ -494,11 +494,14 @@ def favorite():
     user = get_user( conn, curs )
 
     # Get favorite tweet list.
-    sql = ( 'select user.prof_pict, user.username, tweet.time, tweet.content, tweet.id ' +
+    sql = ( 'select user.prof_pict, user.username, tweet.time, tweet.content, tweet.id, ' +
+            'user.id, bin(follow.active_flg) ' +
             'from favorite ' +
             'inner join tweet on favorite.tweet_id = tweet.id ' +
-            'inner join user on favorite.user_id = user.id ' +
-            'where favorite.user_id = %s and favorite.active_flg = 1' )
+            'inner join user on tweet.user_id = user.id ' +
+            'inner join follow on follow.user_id = tweet.user_id ' +
+            'where favorite.user_id = %s and favorite.active_flg = 1 ' +
+            ' order by tweet.time desc')
     curs.execute( sql, [user_id] )
     tweets = curs.fetchall()
 
