@@ -447,7 +447,7 @@ def tweet_edit(tweet_id):
     pass
 
 # Search words in tweet.
-@application.route('/search', methods=['GET','POST'])
+@application.route('/search', methods=['GET'])
 def search():
             
     # Connect database.
