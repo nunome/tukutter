@@ -73,6 +73,24 @@ def publish_cookie( link_to, login_id ):
     
     return resp
 
+# Check user_id of tweet.
+def check_tweet_user(tweet_id):
+
+    uid = session['user_id']
+
+    # Connect to database.
+    conn, curs = connect_db()
+
+    # Check user of the tweet matches signin user.
+    sql = 'select user_id, content from tweet where id = %s'
+    curs.execute( sql, [tweet_id] )
+    tmp = curs.fetchall()
+
+    if tmp[0][0] != uid:
+        return redirect( request.referrer )
+
+    return tmp
+    
 # Check image file extension.
 def allowed_file(filename):
     return '.' in filename and \
@@ -440,14 +458,45 @@ def tweet():
     # Redirect to profile page.
     return redirect( url_base + '/profile/' + username )
 
-# Edit tweet.
-@application.route('/tweet_edit/<tweet_id>')
-def tweet_edit(tweet_id):
+# Show edit tweet menu.
+@application.route('/tweet/<tweet_id>/edit', methods=['GET'])
+def show_tweet_edit(tweet_id):
 
-    pass
+#    uid = session['user_id']
 
+#    # Connect to database.
+#    conn, curs = connect_db()
+
+#    # Check user of the tweet matches signin user.
+#    sql = 'select user_id, content from tweet where id = %s'
+#    curs.execute( sql, [tweet_id] )
+#    tmp = curs.fetchall()
+
+#    if tmp[0][0] != uid:
+#        return redirect( request.referrer )
+
+    tmp = check_tweet_user(tweet_id)
+    
+    content = tmp[0][1]
+
+    return render_template( 'tweet_edit.html', tweet_id=tid, content=content )
+
+@application.route('/tweet/edit', methods=['POST'])    
+def tweet_edit():
+
+    tweet_id = request.form['tweet_id']
+    content  = request.form['edited_tweet']
+    
+    _ = check_tweet_user(tweet_id)
+
+    # !!! Todo !!!
+    # Update tweet.
+    sql = 'update 
+
+
+    
 # Search words in tweet.
-@application.route('/search', methods=['GET','POST'])
+@application.route('/search', methods=['GET'])
 def search():
             
     # Connect database.
