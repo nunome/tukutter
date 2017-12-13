@@ -493,7 +493,7 @@ def show_tweet_edit(tweet_id):
     
     content = tmp[0][1]
 
-    return render_template( 'tweet_edit.html', user=user, tweet_id=tid, content=content )
+    return render_template( 'tweet_edit.html', user=user, tweet_id=tweet_id, content=content )
 
 @application.route('/tweet/edit', methods=['POST'])    
 def tweet_edit():

@@ -53,7 +53,7 @@
         <span class="user-name">{{tweet[1]}}</span>
         <span class="tweet-time">{{tweet[2]}}</span>
 	{% if tweet[1] == session.username %}
-	<a href="/tweet/edit/{{tweet[4]}}"><img class="edit" src="../static/img/pencil.png" alt=""></a>
+	<a href="/tweet/{{tweet[4]}}/edit"><img class="edit" src="../static/img/pencil.png" alt=""></a>
 	{% endif %}
         <!-- <span class="follow">フォロー中</span> プロフィールのtweetにはフォロー中いらない-->
       </p>
