@@ -100,6 +100,76 @@ def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.', 1)[1] in allowed_extensions
 
+# Get tweet list with tweet id.
+def get_tweet_list(tid_list):
+
+    conn, curs = connect_db()
+
+    # Get user's id.
+    user_id = session['user_id']
+    
+    # Get tweet info from tweet id.
+    tweets    = []
+    users     = []
+    follows   = []
+    favorites = []
+
+    print('In: ' + str(tid_list))
+    
+    for tid in tid_list:
+
+        print('tid: ' + str(tid[0]))
+
+        # Get tweet info.
+        sql = ( 'select tweet.time, tweet.content, tweet.user_id ' +
+                'from tweet ' +
+                'where tweet.id = %s' )
+        curs.execute( sql, [tid[0]] )
+        tweet_tmp = curs.fetchall()
+        tweets.append( tweet_tmp[0] )
+
+        print('Done tweets, next is users')
+        
+        # Get user info.
+        sql = ( 'select user.prof_pict, user.username, user.id ' +
+                'from user ' +
+                'inner join tweet on tweet.user_id = user.id ' +
+                'where tweet.id = %s' )
+        curs.execute( sql, [tid[0]] )
+        user_tmp = curs.fetchall()
+        users.append( user_tmp[0] )
+
+        print('Done users, next is follows')
+        
+        # Get follow status.
+        if user_id == tweet_tmp[0][2]:
+            follow_tmp = '2'
+        else:    
+            sql = ( 'select bin(follow.active_flg) ' +
+                    'from follow ' +
+                    'where follow.follower_id = %s and follow.user_id = %s' )
+            curs.execute( sql, [user_id, tweet_tmp[0][2]] )
+            follow_tmp = curs.fetchall()
+        follows.append( follow_tmp[0] )
+
+        print('Done follows, nwxt is favorites')
+        
+        # Get favorite status.
+        sql = ( 'select bin(favorite.active_flg) ' +
+                'from favorite ' +
+                'where favorite.user_id = %s and favorite.tweet_id = %s' )
+        curs.execute( sql, [user_id, tid[0]] )
+        favorite_tmp = curs.fetchall()
+        favorites.append( favorite_tmp[0] )
+
+        print('Done favorites, go to next index')
+
+    # Close connection.
+    conn.close()
+    curs.close()
+
+    return users, tweets, follows, favorites
+
 # Run this process before every route() function.
 @application.before_request
 def pre_request():
@@ -485,6 +555,7 @@ def show_tweet_edit(tweet_id):
     # Get user's info.
     user = get_user( conn, curs )
 
+
     # Close connection.
     conn.close()
     curs.close()
@@ -527,6 +598,20 @@ def tweet_edit():
 
     return redirect( url_base+'/profile' )
     
+    
+# Show search page.
+@application.route('/search/form')
+def show_search():
+
+    # Connect database.
+    conn, curs = connect_db()
+
+    # Get user info.
+    user = get_user( conn, curs )
+
+    return render_template( 'search.html', user=user, tweet='' )
+
+
 # Search words in tweet.
 @application.route('/search', methods=['GET'])
 def search():
@@ -537,11 +622,8 @@ def search():
     # Get user info.
     user = get_user( conn, curs )
 
-    if request.method == 'GET':
-        return render_template( 'search.html', user=user, tweets='' )
-
     # Get search word from the form.
-    word = request.form['word']
+    word = request.args.get('word')
 
     # Get tweets including search word.
     sql = ( 'select user.prof_pict, user.username, tweet.time, tweet.content, tweet.id, user.id ' +
@@ -594,19 +676,78 @@ def favorite():
     # Get user info.
     user = get_user( conn, curs )
 
-    # Get favorite tweet list.
-    sql = ( 'select user.prof_pict, user.username, tweet.time, tweet.content, tweet.id, ' +
-            'user.id, bin(follow.active_flg) ' +
+    # Get tweet_id list what user favors.
+    sql = ( 'select favorite.tweet_id ' +
             'from favorite ' +
-            'inner join tweet on favorite.tweet_id = tweet.id ' +
-            'inner join user on tweet.user_id = user.id ' +
-            'inner join follow on follow.user_id = tweet.user_id ' +
-            'where favorite.user_id = %s and favorite.active_flg = 1 ' +
-            ' order by tweet.time desc')
+            'where favorite.user_id = %s' ) 
     curs.execute( sql, [user_id] )
-    tweets = curs.fetchall()
+    tid_list = curs.fetchall()
 
-    return render_template( 'favorite.html', user=user, tweets=tweets )
+    print(str(len(tid_list)))
+    
+    users, tweets, follows, favorites = get_tweet_list(tid_list)
+
+    conn.close()
+    curs.close()
+    
+#    # Get tweet info from tweet id.
+#    tweets    = []
+#    users     = []
+#    follows   = []
+#    favorites = []
+    
+#    for tid in tid_list:
+
+#        print('tid: ' + str(tid[0]))
+
+#        # Get tweet info.
+#        sql = ( 'select tweet.time, tweet.content, tweet.user_id ' +
+#                'from tweet ' +
+#                'where tweet.id = %s' )
+#        curs.execute( sql, [tid[0]] )
+#        tweet_tmp = curs.fetchall()
+#        tweets.append( tweet_tmp[0] )
+#
+#        print('Done tweets, next is users')
+#        
+#        # Get user info.
+#        sql = ( 'select user.prof_pict, user.username, user.id ' +
+#                'from user ' +
+#                'inner join tweet on tweet.user_id = user.id ' +
+#                'where tweet.id = %s' )
+#        curs.execute( sql, [tid[0]] )
+#        user_tmp = curs.fetchall()
+#        users.append( user_tmp[0] )
+
+        # print('Done users, next is follows')
+        
+        # # Get follow status.
+        # if user_id == tweet_tmp[0][2]:
+        #     follow_tmp = '2'
+        # else:    
+        #     sql = ( 'select bin(follow.active_flg) ' +
+        #             'from follow ' +
+        #             'where follow.follower_id = %s and follow.user_id = %s' )
+        #     curs.execute( sql, [user_id, tweet_tmp[0][2]] )
+        #     follow_tmp = curs.fetchall()
+        # follows.append( follow_tmp[0] )
+
+        # print('Done follows, nwxt is favorites')
+        
+        # # Get favorite status.
+        # sql = ( 'select bin(favorite.active_flg) ' +
+        #         'from favorite ' +
+        #         'where favorite.user_id = %s and favorite.tweet_id = %s' )
+        # curs.execute( sql, [user_id, tid[0]] )
+        # favorite_tmp = curs.fetchall()
+        # favorites.append( favorite_tmp[0] )
+
+        # print('Done favorites, go to next index')
+
+
+        
+    return render_template( 'favorite.html', user=user,
+                            users=users, tweets=tweets, follows=follows, favorites=favorites )
     
     
 # Add/Cancel tweet as favorite.

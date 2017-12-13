@@ -19,7 +19,7 @@
     <nav>
       <ul>
 	<li><a href="/top">top</a></li>
-	<li><a href="/search">検索</a></li>
+	<li><a href="/search/form">検索</a></li>
 	<li><a href="/tweet">つぶやく</a></li>
 	<li><a href="/favorite">お気に入り</a></li>
 	<li><a href="/signout">ログアウト</a></li>
@@ -32,20 +32,20 @@
     {% for tweet in tweets %}
     <div class="content">
       <div class="stream-header">
-	<a href="/profile/{{tweet[1]}}"><img src={{tweet[0]}} alt=""></a>
+	<a href="/profile/{{users[loop.index0][1]}}"><img src={{users[loop.index0][0]}} alt=""></a>
 	<p>
-	  <a href="/profile/{{tweet[1]}}"><span class="user-name">{{tweet[1]}}</span></a>
-	  <span class="tweet-time">{{tweet[2]}}</span>
-	  <span class="follow"><a href="/follow/{{tweet[5]}}">{% if tweet[6] == '1' %}フォロー中{% else %}フォローする{% endif %}</a></span>
+	  <a href="/profile/{{users[loop.index0][1]}}"><span class="user-name">{{users[loop.index0][1]}}</span></a>
+	  <span class="tweet-time">{{tweet[0]}}</span>
+	  <span class="follow"><a href="/follow/{{users[loop.index0][2]}}">{% if follows[loop.index0] == '2' %}{% elif follows[loop.index0] == '1' %}フォロー中{% else %}フォローする{% endif %}</a></span>
 	</p>
       </div>
       <div class="inline">
 	<div class="stream-content">
-	  <p>{{tweet[3]}}</p>
+	  <p>{{tweet[1]}}</p>
 	</div>
 	<div class="stream-footer">
 	  <div class="favorite">
-	    <a href="/favorite{{tweet[4]}}"><img src="../static/img/logo-pic.png" alt=""></a>
+	    <a href="/favorite/{{users[loop.index0][2]}}"><img src="../static/img/logo-pic.png" alt=""></a>
 	  </div>
 	</div>
       </div>
