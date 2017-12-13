@@ -19,7 +19,7 @@
     <nav>
       <ul>
 	<li><a href="/top">top</a></li>
-	<li><a href="/search">検索</a></li>
+	<li><a href="/search/form">検索</a></li>
 	<li><a href="/tweet">つぶやく</a></li>
 	<li><a href="/favorite">お気に入り</a></li>
 	<li><a href="/signout">ログアウト</a></li>
@@ -28,7 +28,7 @@
   </header>
 
   <div class="search">
-    <form class="search-form" action="/search" method="post">
+    <form class="search-form" action="/search" method="get">
       <input class="search-input" type="text" name="word" value="">
       <input type="submit" name="submit" value="検索">
     </form>
