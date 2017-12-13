@@ -446,8 +446,20 @@ def tweet_edit(tweet_id):
 
     pass
 
+# Show search page.
+@application.route('/search/form')
+def show_search():
+
+    # Connect database.
+    conn, curs = connect_db()
+
+    # Get user info.
+    user = get_user( conn, curs )
+
+    return render_template( 'search.html', user=user, tweet='' )
+
 # Search words in tweet.
-@application.route('/search', methods=['GET','POST'])
+@application.route('/search', methods=['GET'])
 def search():
             
     # Connect database.
@@ -456,11 +468,8 @@ def search():
     # Get user info.
     user = get_user( conn, curs )
 
-    if request.method == 'GET':
-        return render_template( 'search.html', user=user, tweets='' )
-
     # Get search word from the form.
-    word = request.form['word']
+    word = request.args.get('word')
 
     # Get tweets including search word.
     sql = ( 'select user.prof_pict, user.username, tweet.time, tweet.content, tweet.id, user.id ' +
