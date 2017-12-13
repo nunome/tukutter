@@ -43,7 +43,7 @@
 	<p>
 	  <a href="/profile/{{tweet[1]}}"><span class="user-name">{{tweet[1]}}</span></a>
 	  <span class="tweet-time">{{tweet[2]}}</span>
-	  <span class="follow"><a href="/follow/{{tweet[5]}}">{% if tweet[6] == '1' %}フォロー中{% else %}フォローする{% endif %}</a></span>
+	  <span class="follow"><a href="/follow/{{tweet[5]}}">{% if fflg[loop.index0] == '1' %}フォロー中{% elif fflg[loop.index0] == 0 %}フォローする{% else %}{% endif %}</a></span>
 	</p>
       </div>
       <div class="inline">
