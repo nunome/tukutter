@@ -5,7 +5,7 @@
 {% block title %}tweet{% endblock %}
 
 {% block body %}
- <main id="tweet">
+  <main id="tweet">
     <header>
       <div class="profile">
         <a href="/profile"><img src={{user[0][0]}} alt=""></a>
@@ -14,7 +14,7 @@
       <nav>
         <ul>
           <li><a href="/top">top</a></li>
-          <li><a href="/search/form">検索</a></li>
+          <li><a href="/search">検索</a></li>
           <li><a href="/tweet">つぶやく</a></li>
           <li><a href="favorite">お気に入り</a></li>
           <li><a href="/signout">ログアウト</a></li>
@@ -23,9 +23,11 @@
     </header>
 
     <div class="tweet">
-      <form class="tweet-form" action="/tweet" method="post">
-        <textarea name="tweet"></textarea>
-        <button type="submit" name="submit" value="tweet">つぶやく</button>
+      <form class="tweet-form" action="/tweet/edit" method="post">
+        <textarea name="edited_tweet">{{content}}</textarea>
+	<input type="hidden" name="tweet_id" value="{{tweet_id}}">
+        <button type="submit" name="submit" value="save">保存</button>
+	<button type="submit" name="submit" value="delete">削除</button>
       </form>
     </div>
 

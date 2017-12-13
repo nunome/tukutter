@@ -73,6 +73,28 @@ def publish_cookie( link_to, login_id ):
     
     return resp
 
+# Check user_id of tweet.
+def check_tweet_user(tweet_id):
+
+    uid = session['user_id']
+
+    # Connect to database.
+    conn, curs = connect_db()
+
+    # Check user of the tweet matches signin user.
+    sql = 'select user_id, content from tweet where id = %s'
+    curs.execute( sql, [tweet_id] )
+    tmp = curs.fetchall()
+
+    # Close connection.
+    conn.close()
+    curs.close()
+    
+    if tmp[0][0] != uid:
+        return redirect( request.referrer )
+
+    return tmp
+    
 # Check image file extension.
 def allowed_file(filename):
     return '.' in filename and \
@@ -510,12 +532,73 @@ def tweet():
     # Redirect to profile page.
     return redirect( url_base + '/profile/' + username )
 
-# Edit tweet.
-@application.route('/tweet_edit/<tweet_id>')
-def tweet_edit(tweet_id):
+# Show edit tweet menu.
+@application.route('/tweet/<tweet_id>/edit', methods=['GET'])
+def show_tweet_edit(tweet_id):
 
-    pass
+#    uid = session['user_id']
 
+#    # Connect to database.
+#    conn, curs = connect_db()
+
+#    # Check user of the tweet matches signin user.
+#    sql = 'select user_id, content from tweet where id = %s'
+#    curs.execute( sql, [tweet_id] )
+#    tmp = curs.fetchall()
+
+#    if tmp[0][0] != uid:
+#        return redirect( request.referrer )
+
+    # Connect to database.
+    conn, curs = connect_db()
+    
+    # Get user's info.
+    user = get_user( conn, curs )
+
+
+    # Close connection.
+    conn.close()
+    curs.close()
+    
+    tmp = check_tweet_user(tweet_id)
+    
+    content = tmp[0][1]
+
+    return render_template( 'tweet_edit.html', user=user, tweet_id=tweet_id, content=content )
+
+@application.route('/tweet/edit', methods=['POST'])    
+def tweet_edit():
+
+    tweet_id = request.form['tweet_id']
+    content  = request.form['edited_tweet']
+    
+    _ = check_tweet_user(tweet_id)
+
+    # Connect to database.
+    conn, curs = connect_db()
+
+    # Handle action.
+    action = request.form['submit']
+    
+    if action == 'delete':
+        # Delete tweet.
+        sql = 'update tweet set active_flg = 0 where id = %s'
+        curs.execute( sql, [tweet_id] )
+        
+    elif action == 'save':
+        # Update tweet.
+        sql = 'update tweet set content = %s where id = %s'
+        curs.execute( sql, [content, tweet_id] )
+
+    conn.commit()
+
+    # Close connection.
+    curs.close()
+    conn.close()
+
+    return redirect( url_base+'/profile' )
+    
+    
 # Show search page.
 @application.route('/search/form')
 def show_search():
@@ -527,6 +610,7 @@ def show_search():
     user = get_user( conn, curs )
 
     return render_template( 'search.html', user=user, tweet='' )
+
 
 # Search words in tweet.
 @application.route('/search', methods=['GET'])
