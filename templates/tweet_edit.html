@@ -23,9 +23,11 @@
     </header>
 
     <div class="tweet">
-      <form class="tweet-form" action="/tweet" method="post">
-        <textarea name="tweet"></textarea>
-        <button type="submit" name="submit" value="tweet">つぶやく</button>
+      <form class="tweet-form" action="/tweet/edit" method="post">
+        <textarea name="edited_tweet" value="{{content}}"></textarea>
+	<input type="hidden" name="tweet_id" value="{{tweet_id}}">
+        <button type="submit" name="submit" value="save">保存</button>
+	<button type="submit" name="submit" value="delete">削除</button>
       </form>
     </div>
 
