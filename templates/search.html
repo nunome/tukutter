@@ -4,7 +4,7 @@
 
 {% block script %}
 <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-<script type="text/javascript" src="../static/js/index.js"></script>
+<script type="text/javascript" src="/static/js/index.js"></script>
 {% endblock %}
 
 {% block title %}search{% endblock %}
@@ -43,7 +43,12 @@
 	<p>
 	  <a href="/profile/{{tweet[1]}}"><span class="user-name">{{tweet[1]}}</span></a>
 	  <span class="tweet-time">{{tweet[2]}}</span>
-	  <span class="follow"><a href="/follow/{{tweet[5]}}">{% if fflg[loop.index0] == '1' %}フォロー中{% elif fflg[loop.index0] == 0 %}フォローする{% else %}{% endif %}</a></span>
+	  {% if   fflg[loop.index0][0] == '2' %}
+	  {% elif fflg[loop.index0][0] == '1' %}
+	  <span class="follow"><a href="/follow/{{tweet[5]}}">フォロー中</a></span>
+	  {% else %}
+	  <span class="follow"><a href="/follow/{{tweet[5]}}">フォローする</a></span>
+	  {% endif %}
 	</p>
       </div>
       <div class="inline">
@@ -52,7 +57,7 @@
 	</div>
 	<div class="stream-footer">
 	  <div class="favorite">
-	    <a href="/favorite/{{tweet[4]}}"><img src="../static/img/logo-pic.png" alt=""></a>
+	    <a href="/favorite/{{tweet[4]}}"><img src="/static/img/logo-pic.png" alt=""></a>
 	  </div>
 	</div>
       </div>
