@@ -5,7 +5,8 @@ import MySQLdb, os, random, string
 
 
 url_base = 'http://localhost:8080'
-upload_folder = './static/img'
+# url_base = 'http://service.nunotter.site'
+upload_folder = './static/img/user'
 allowed_extensions = set(['png','jpg'])
 
 application = Flask(__name__)
