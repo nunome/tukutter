@@ -4,7 +4,7 @@
 
 {% block script %}
   <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-  <script type="text/javascript" src="../static/js/index.js"></script>
+  <script type="text/javascript" src="/static/js/index.js"></script>
 {% endblock %}
   
 {% block title %}top{% endblock %}
@@ -13,8 +13,8 @@
   <main id="index">
     <header>
       <div class="profile">
-      <a href="/profile"><img src={{user[0][0]}} alt=""></a>
-	  <a href="/profile"><p>{{user[0][1]}}</p></a>
+	<a href="/profile"><img src={{user[0][0]}} alt=""></a>
+	<a href="/profile"><p>{{user[0][1]}}</p></a>
       </div>
       <nav>
 	<ul>
@@ -28,30 +28,39 @@
     </header>
     
     <div class="stream">
-    {% if tweets %}
-    {% for tweet in tweets %}
+      {% if tweets %}
+      {% for tweet in tweets %}
       <div class="content">
-	    <div class="stream-header">
-	      <a href="/profile/{{tweet[1]}}"><img src={{tweet[0]}} alt=""></a>
-	      <p>
-	        <span class="user-name">{{tweet[1]}}</span>
-	        <span class="tweet-time">{{tweet[2]}}</span>
-	        <span class="follow"><a href="/follow/{{tweet[5]}}">フォロー中</a></span>
-	      </p>
+	<div class="stream-header">
+	  <a href="/profile/{{users[loop.index0][1]}}"><img src={{users[loop.index0][0]}} alt=""></a>
+	  <p>
+	    <a href="profile/{{users[loop.index0][1]}}"<span class="user-name">{{users[loop.index0][1]}}</span></a>
+	       <span class="tweet-time">{{tweet[0]}}</span>
+	       {% if follows[loop.index0][0] == '2' %}
+	       {% elif follows[loop.index0][0] == '1' %}
+	       <a href="/follow/{{users[loop.index0][2]}}"><span class="follow">フォロー中</span></a>
+	       {% else %}
+	       <a href="/follow/{{users[loop.index0][2]}}"><span class="follow">フォローする</span></a>
+	       {% endif %}
+          </p>
+        </div>
+	  <div class="inline">
+	    <div class="stream-content">
+	      <p>{{tweet[1]}}</p>
 	    </div>
-	    <div class="inline">
-	      <div class="stream-content">
-	        <p>{{tweet[3]}}</p>
+	    <div class="stream-footer">
+	      <div class="favorite">
+		{% if favorites[loop.index0][0] == '1' %}
+	        <a href="/favorite/{{tweet[3]}}"><img src="/static/img/logo-pic.png" alt=""></a>
+		{% else %}
+		<a href="/favorite/{{tweet[3]}}"><img src="/static/img/logo-pic_non.png" alt=""></a>
+		{% endif %}
 	      </div>
-	      <div class="stream-footer">
-	        <div class="favorite">
-	          <a href="/favorite/{{tweet[4]}}"><img src="/static/img/logo-pic.png" alt=""></a>
-	        </div>
-	      </div>
-	    </div>
+ 	    </div>
+       	  </div>
       </div>
-{% endfor %}
-{% endif %}
+      {% endfor %}
+      {% endif %}
     </div>
   </main>
 {% endblock %}
