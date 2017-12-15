@@ -64,11 +64,7 @@ def publish_cookie( link_to, login_id ):
     # Set cookie.
     max_age = 60*60*24 # 1day
     expires = int( datetime.now().timestamp() ) + max_age
-    # path    = '/'
-    # domain  = 'tukutter.test:8080'
-    # secure  = None
-    # httponly = False
-    
+
     resp.set_cookie( 'login_id', login_id, max_age, expires )
     resp.set_cookie( 'token', token, max_age, expires )
     
@@ -437,7 +433,8 @@ def top():
     sql = ('select tweet.id ' +
            'from tweet ' +
            'inner join follow on follow.user_id = tweet.user_id ' +
-           'where (follow.follower_id = %s or tweet.user_id = %s) and tweet.active_flg = 1 ' +
+           'where (follow.follower_id = %s or tweet.user_id = %s) and ' +
+           'tweet.active_flg = 1 and follow.active_flg = 1 ' +
            'order by tweet.time desc' )
     curs.execute( sql, [user_id, user_id] )
     tid_list = curs.fetchall()
@@ -604,7 +601,6 @@ def tweet_edit():
 
     return redirect( url_base+'/profile' )
     
-    
 # Show search page.
 @application.route('/search/form')
 def show_search():
@@ -616,7 +612,6 @@ def show_search():
     user = get_user( conn, curs )
 
     return render_template( 'search.html', user=user, tweet='' )
-
 
 # Search words in tweet.
 @application.route('/search', methods=['GET'])
@@ -631,41 +626,59 @@ def search():
     # Get search word from the form.
     word = request.args.get('word')
 
-    # Get tweets including search word.
-    sql = ( 'select user.prof_pict, user.username, tweet.time, tweet.content, tweet.id, user.id ' +
-            'from user ' +
-            'inner join tweet on tweet.user_id = user.id ' +
+    # Get tweet_id list including 'word'.
+    sql = ( 'select tweet.id ' +
+            'from tweet ' +
             'where tweet.content like %s and tweet.active_flg = 1 ' +
             'order by tweet.time desc' )
     curs.execute( sql, [('%'+word+'%')] )
-    tweets = curs.fetchall()
+    tid_list = curs.fetchall()
 
-    # Check active_flg of follow action from signin user to user of the tweet.
-    fflg = []
+    # Get tweets.
+    users, tweets, follows, favorites = get_tweet_list(tid_list)
 
-    if tweets:
+    # Close connection.
+    conn.close()
+    curs.close()
 
-        uid = session['user_id']
+    return render_template( 'search.html', user=user,
+                            users=users, tweets=tweets, follows=follows, favorites=favorites )
+    
+#    # Get tweets including search word.
+#    sql = ( 'select user.prof_pict, user.username, tweet.time, tweet.content, tweet.id, user.id ' +
+#            'from user ' +
+#            'inner join tweet on tweet.user_id = user.id ' +
+#            'where tweet.content like %s and tweet.active_flg = 1 ' +
+#            'order by tweet.time desc' )
+#    curs.execute( sql, [('%'+word+'%')] )
+#    tweets = curs.fetchall()
+
+#    # Check active_flg of follow action from signin user to user of the tweet.
+#    fflg = []
+
+#    if tweets:
+
+#        uid = session['user_id']
         
-        for num in range(len(tweets)):
-            tid  = tweets[num][4]
-            tuid = tweets[num][5]
+#        for num in range(len(tweets)):
+#            tid  = tweets[num][4]
+#            tuid = tweets[num][5]
             
-            sql = ( 'select bin(follow.active_flg) ' +
-                    'from follow ' +
-                    'inner join tweet on tweet.user_id = follow.user_id ' +
-                    'where tweet.id = %s and follow.user_id = %s and follow.follower_id = %s' )
-            curs.execute( sql, [ tid, tuid, uid ] )
-            tmp = curs.fetchall()
+#            sql = ( 'select bin(follow.active_flg) ' +
+#                    'from follow ' +
+#                    'inner join tweet on tweet.user_id = follow.user_id ' +
+#                    'where tweet.id = %s and follow.user_id = %s and follow.follower_id = %s' )
+#            curs.execute( sql, [ tid, tuid, uid ] )
+#            tmp = curs.fetchall()
 
-            if tuid == uid:
-                fflg.append('2')
-            elif not tmp:
-                fflg.append('0')
-            else:
-                fflg.append(tmp[0][0])
+#            if tuid == uid:
+#                fflg.append('2')
+#            elif not tmp:
+#                fflg.append('0')
+#            else:
+#                fflg.append(tmp[0][0])
 
-    return render_template( 'search.html', user=user, tweets=tweets, fflg=fflg )
+#    return render_template( 'search.html', user=user, tweets=tweets, fflg=fflg )
 
 # Show favorite page.
 @application.route('/favorite')
