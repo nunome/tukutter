@@ -171,6 +171,8 @@ def get_tweet_list(tid_list):
                     'where follow.follower_id = %s and follow.user_id = %s' )
             curs.execute( sql, [user_id, tweet_tmp[0][2]] )
             follow_tmp = curs.fetchall()
+            if not follow_tmp:
+                follow_tmp = '0'
         follows.append( follow_tmp[0] )
 
         print('Done follows, next is favorites')
