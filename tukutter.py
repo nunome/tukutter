@@ -97,6 +97,29 @@ def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.', 1)[1] in allowed_extensions
 
+# Check existance of input value at database.
+def isexist_db(item,word):
+
+    conn, curs = connect_db()
+    
+    # Get all values indicated by item.
+    sql = ( 'select %s from user where active_flg = 1' )
+    curs.execute( sql % item )
+    word_lists = curs.fetchall()
+    
+    result = False
+    
+    # Search word from tmp.
+    for word_list in word_lists:
+        if word_list[0] == word:
+            result = True
+
+    # Close. 
+    conn.close()
+    curs.close()
+    
+    return result
+
 # Get tweet list with tweet id.
 def get_tweet_list(tid_list):
 
@@ -456,17 +479,26 @@ def redirect_profile():
     global url_base
     
     return redirect( url_base + '/profile/' + session['username'] )
-    
-@application.route('/profile/<in_name>')
-def profile(in_name):
 
-    ## [Need to handle when in_name is empty.]
+@application.route('/profile/')
+def redirect_empty_profile():
+
+    global url_base
+    
+    return redirect( url_base + '/profile' )
+
+@application.route('/profile/<in_name>')
+def profile(in_name=None):
     
     global url_base
+
+    # Check existance of input word.
+    if not isexist_db('username',in_name):
+        # Return to previous page.
+        return redirect( request.referrer )
     
     # Get login user's value from session.
     user_id  = session['user_id']
-    username = session['username']
         
     # Connect to database.
     conn, curs = connect_db()
@@ -474,31 +506,31 @@ def profile(in_name):
     # Get user's profile info includes image.
     user = get_user( conn, curs )
     
-    # Get requested user's profile and tweets.
+    # Get requested user's profile.
     sql = 'select prof_pict, username, profile, id from user where username = %s'
     curs.execute( sql, [in_name] )
     disp_user = curs.fetchall()
 
-    sql = ( 'select user.prof_pict, user.username, tweet.time, tweet.content, tweet.id ' +
-            'from user ' +
-            'inner join tweet on tweet.user_id = user.id ' +
-            'where tweet.user_id = %s and tweet.active_flg = 1 ' +
+    # Get tweets list.
+    sql = ( 'select tweet.id ' +
+            'from tweet ' +
+            'inner join user on user.id = tweet.user_id ' +
+            'where user.username = %s and tweet.active_flg = 1 ' +
             'order by tweet.time desc' )
-    curs.execute( sql, [disp_user[0][3]] )
-    tweets = curs.fetchall()
+    curs.execute( sql, [in_name] )
+    tid_list = curs.fetchall()
+
+    # Get tweets.
+    users, tweets, follows, favorites = get_tweet_list(tid_list)
 
     # Disconnect from database.
     conn.close()
     curs.close()
 
-    ## [Need to add function to distingush follow or not and requested user is as signin user or not]
-    ## In case of requested to show signin user.
-    # if in_name == username:
-        ## Jump as login user.
-        
-    return render_template( 'profile.html', user=user, disp_user=disp_user, tweets=tweets )
-    
+    return render_template( 'profile.html', user=user, disp_user=disp_user,
+                            users=users, tweets=tweets, follows=follows, favorites=favorites )
 
+# Tweets.
 @application.route('/tweet', methods=['GET','POST'])
 def tweet():
 
