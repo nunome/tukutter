@@ -4,7 +4,7 @@
 
 {% block script %}
 <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-<script type="text/javascript" src="../static/js/profile.js"></script>
+<script type="text/javascript" src="/static/js/profile.js"></script>
 {% endblock %}
 
 {% block title %}profile{% endblock %}
@@ -30,46 +30,55 @@
   <div class="profilecard">
     <div class="profile-header">
       <img src={{disp_user[0][0]}} alt="">
-      <p><span class="user-name">{{disp_user[0][1]}}</span>
-	{% if session.username == disp_user[0][1] %}
-	<a href="/profile_edit"><img class="edit" src="../static/img/pencil.png" alt=""></a></p>
-        {% else %}
-      <!-- フォロー中のボタンがいる --></p>
-        {% endif %}
+      <p>
+	<span class="user-name">{{disp_user[0][1]}}</span>
+	{% if follows[0][0] == '2' %}
+	<a href="/profile_edit"><img class="edit" src="/static/img/pencil.png" alt=""></a>
+	{% endif %}
+       </p>
     </div>
     <div class="profile-content">
       <p>{{disp_user[0][2]}}</p>
-      <!-- フォロー中かどうかの表示が必要 -->
+      {% if   follows[0][0] == '2' %}
+      {% elif follows[0][0] == '1' %}
+      <a href="/follow/{{disp_user[0][3]}}"><span class="follow">フォロー中</span></a>
+      {% else %}
+      <a href="/follow/{{disp_user[0][3]}}"><span class="follow">フォローする</span></a>
+      {% endif %}
     </div>
   </div>
 
   <div class="stream">
-    
+{% if tweets %}
 {% for tweet in tweets %}
   <div class="content">
     <div class="stream-header">
-      <img src={{tweet[0]}} alt="">
+      <a href="/profile/{{users[loop.index0][1]}}"><img src={{users[loop.index0][0]}} alt=""></a>
       <p>
-        <span class="user-name">{{tweet[1]}}</span>
-        <span class="tweet-time">{{tweet[2]}}</span>
-	{% if tweet[1] == session.username %}
-	<a href="/tweet/{{tweet[4]}}/edit"><img class="edit" src="../static/img/pencil.png" alt=""></a>
+        <a href="profile/{{users[loop.index0][1]}}"><span class="user-name">{{users[loop.index0][1]}}</span></a>
+	<span class="tweet-time">{{tweet[0]}}</span>
+	{% if follows[0][0] == '2' %}
+	<a href="/tweet/{{tweet[3]}}/edit"><img class="edit" src="/static/img/pencil.png" alt=""></a>
 	{% endif %}
-        <!-- <span class="follow">フォロー中</span> プロフィールのtweetにはフォロー中いらない-->
       </p>
     </div>
     <div class="inline">
       <div class="stream-content">
-        <p>{{tweet[3]}}</p>
+        <p>{{tweet[1]}}</p>
       </div>
       <div class="stream-footer">
         <div class="favorite">
-	  <a href="/favorite"><img src="../static/img/logo-pic.png" alt=""></a>
+	  {% if favorites[loop.index0][0] == '1' %}
+	  <a href="/favorite/{{tweet[3]}}"><img src="/static/img/logo-pic.png" alt=""></a>
+	  {% else %}
+	  <a href="/favorite/{{tweet[3]}}"><img src="/static/img/logo-pic_non.png" alt=""></a>
+	  {% endif %}
         </div>
       </div>
     </div>
   </div>
-{% endfor %}
+  {% endfor %}
+  {% endif %}
   </div>
 </main>
 {% endblock %}
