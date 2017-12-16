@@ -644,41 +644,6 @@ def search():
     return render_template( 'search.html', user=user,
                             users=users, tweets=tweets, follows=follows, favorites=favorites )
     
-#    # Get tweets including search word.
-#    sql = ( 'select user.prof_pict, user.username, tweet.time, tweet.content, tweet.id, user.id ' +
-#            'from user ' +
-#            'inner join tweet on tweet.user_id = user.id ' +
-#            'where tweet.content like %s and tweet.active_flg = 1 ' +
-#            'order by tweet.time desc' )
-#    curs.execute( sql, [('%'+word+'%')] )
-#    tweets = curs.fetchall()
-
-#    # Check active_flg of follow action from signin user to user of the tweet.
-#    fflg = []
-
-#    if tweets:
-
-#        uid = session['user_id']
-        
-#        for num in range(len(tweets)):
-#            tid  = tweets[num][4]
-#            tuid = tweets[num][5]
-            
-#            sql = ( 'select bin(follow.active_flg) ' +
-#                    'from follow ' +
-#                    'inner join tweet on tweet.user_id = follow.user_id ' +
-#                    'where tweet.id = %s and follow.user_id = %s and follow.follower_id = %s' )
-#            curs.execute( sql, [ tid, tuid, uid ] )
-#            tmp = curs.fetchall()
-
-#            if tuid == uid:
-#                fflg.append('2')
-#            elif not tmp:
-#                fflg.append('0')
-#            else:
-#                fflg.append(tmp[0][0])
-
-#    return render_template( 'search.html', user=user, tweets=tweets, fflg=fflg )
 
 # Show favorite page.
 @application.route('/favorite')
@@ -696,7 +661,9 @@ def favorite():
     # Get tweet_id list what user favors.
     sql = ( 'select favorite.tweet_id ' +
             'from favorite ' +
-            'where favorite.user_id = %s' ) 
+            'inner join tweet on tweet.id = favorite.tweet_id '
+            'where favorite.user_id = %s and favorite.active_flg = 1 ' +
+            'order by tweet.time desc' ) 
     curs.execute( sql, [user_id] )
     tid_list = curs.fetchall()
     
