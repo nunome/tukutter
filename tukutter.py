@@ -134,8 +134,12 @@ def get_tweet_list(tid_list):
     follows   = []
     favorites = []
 
+    # Return empty values when tid_list is empty.
+    if not tid_list:
+        return users, tweets, follows, favorites
+
     print('In: ' + str(tid_list))
-    
+
     for tid in tid_list:
 
         print('tid: ' + str(tid[0]))
@@ -523,6 +527,22 @@ def profile(in_name=None):
     # Get tweets.
     users, tweets, follows, favorites = get_tweet_list(tid_list)
 
+    if not follows:
+        # Make follows to distinguish follow status.
+        if user_id == disp_user[0][3]:
+            follows = '2'
+        else:    
+            sql = ( 'select bin(active_flg) ' +
+                    'from follow ' +
+                    'where follower_id = %s and user_id = %s' )
+            curs.execute( sql, [ user_id, disp_user[0][3] ] )
+            tmp = curs.fetchall()
+
+            if not tmp:
+                follows = '0'
+            else:
+                follows = tmp[0]
+            
     # Disconnect from database.
     conn.close()
     curs.close()
