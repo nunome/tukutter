@@ -430,7 +430,9 @@ def prof_edit():
     
     # Upload profile image.
     if img_file and allowed_file(img_file.filename):
-        filename = secure_filename(img_file.filename)
+        # filename = secure_filename(img_file.filename)
+        filename = ( str(user_id) + '_' +
+                     datetime.now().strftime('%y%m%d-%H%M%S') + img_file.filename[-4:] )
         img_file.save( os.path.join(application.config['UPLOAD_FOLDER'], filename) )
 
         sql = 'update user set prof_pict = %s where id = %s'
