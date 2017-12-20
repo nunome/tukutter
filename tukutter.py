@@ -458,16 +458,22 @@ def top():
     # Get user's profile info includes image.
     user = get_user( conn, curs )
 
-    # Get user id list who are followed by user.
+    # Get tweet_id list which are posted by user whom followed by siginin user.
     sql = ('select tweet.id ' +
            'from tweet ' +
            'inner join follow on follow.user_id = tweet.user_id ' +
-           'where (follow.follower_id = %s or tweet.user_id = %s) and ' +
-           'tweet.active_flg = 1 and follow.active_flg = 1 ' +
-           'order by tweet.time desc' )
-    curs.execute( sql, [user_id, user_id] )
-    tid_list = curs.fetchall()
-
+           'where follow.follower_id = %s and ' +
+           'tweet.active_flg = 1 and follow.active_flg = 1' )
+    curs.execute( sql, [user_id] )
+    tmp = curs.fetchall()
+    
+    # Get tweet_id list which posted by signin user.
+    sql = ( 'select tweet.id ' +
+            'from tweet ' +
+            'where tweet.user_id = %s and tweet.active_flg = 1' )
+    curs.execute( sql, [user_id] )
+    tid_list = sorted( tmp + curs.fetchall(), reverse=True )
+    
     # Get tweets.
     users, tweets, follows, favorites = get_tweet_list(tid_list)
 
