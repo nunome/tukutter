@@ -590,28 +590,14 @@ def tweet():
     return redirect( url_base + '/profile/' + username )
 
 # Show edit tweet menu.
-@application.route('/tweet/<tweet_id>/edit', methods=['GET'])
+@application.route('/tweet/<tweet_id>/edit')
 def show_tweet_edit(tweet_id):
-
-#    uid = session['user_id']
-
-#    # Connect to database.
-#    conn, curs = connect_db()
-
-#    # Check user of the tweet matches signin user.
-#    sql = 'select user_id, content from tweet where id = %s'
-#    curs.execute( sql, [tweet_id] )
-#    tmp = curs.fetchall()
-
-#    if tmp[0][0] != uid:
-#        return redirect( request.referrer )
 
     # Connect to database.
     conn, curs = connect_db()
     
     # Get user's info.
     user = get_user( conn, curs )
-
 
     # Close connection.
     conn.close()
