@@ -322,6 +322,11 @@ def signin():
     # Get login user's value from web form.
     login_id = request.form['login_id']
     in_pw    = request.form['password']
+
+    # Check existence of login_id.
+    if not isexist_db( 'login_id', login_id ):
+        # Show error page.
+        return render_template( 'signin.html', error_id=True )
     
     # Connect to database.
     conn, curs = connect_db()
@@ -334,9 +339,8 @@ def signin():
     # Disconnect form database.
     conn.close()
     curs.close()
-    
-    # [Not equiped] If login_id is not found, show error page.
-    
+
+    # Check password.
     user_id  = result[0][0]
     username = result[0][1]
     corr_pw  = result[0][2]
@@ -351,7 +355,7 @@ def signin():
         return resp
 
     else:
-        return render_template( 'error.html', message='パスワードが間違っています。' )
+        return render_template( 'signin.html', error_pw=True )
 
 # Process sign out.
 @application.route('/signout')

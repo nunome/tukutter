@@ -29,7 +29,7 @@
 }
 #login form .inline label {
     font-size: 1.5vw;
-    width: 6vw;
+    width: 8vw;
     display: inline-block;
     vertical-align: bottom;
 }
@@ -56,6 +56,9 @@
 }
 #login form input[type="submit"]:active {
     transform: translateY(5px);
+}
+#login form .error {
+    color: #ff0000;
 }
 #login .registration {
     margin-top: 1.5vw;
@@ -88,7 +91,7 @@
     }
     #login form .inline label {
 	font-size: 4vw;
-	width: 60vw;
+	width: 70vw;
 	display: block;
 	margin-bottom: 2vw;
     }
