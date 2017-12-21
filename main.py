@@ -277,10 +277,18 @@ def signup():
     password      =      request.form['password']
     conf_password = request.form['conf_password']
     username      =      request.form['username']
+
+    # Check existence of login_id.
+    if isexist_db('login_id',login_id):
+        return render_template( 'signup.html', error_id=True, message='すでに使われています。' )
+
+    # Check existence of username.
+    if isexist_db('username',username):
+        return render_template( 'signup.html', error_un=True, message='すでに使われています。' )
     
     # Collate password.
     if password != conf_password:
-        return render_template( 'error.html', message='パスワードが一致していません。' )
+        return render_template( 'signup.html', error_pw=True, message='パスワードが一致していません。' )
 
     # Connect to database.
     conn, curs = connect_db()
