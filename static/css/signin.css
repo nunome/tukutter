@@ -57,7 +57,7 @@
 #login form input[type="submit"]:active {
     transform: translateY(5px);
 }
-#login form .error {
+#login form .error p {
     color: #ff0000;
 }
 #login .registration {
