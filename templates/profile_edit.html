@@ -14,29 +14,38 @@
     <div class="inline">
       <label for="userid">image</label>
       <input id="file" class="file" type="file" name="img_file" value="">
-              <!-- <label for="file" class="view_box">
-          +画像を選択
-          <input id="file" class="file" type="file" name="file" value="" style="display:none;">
-              </label> -->
+    </div>
+    <div class="info">
+      <p>サイズは1MBまで。フォーマットは.png .jpgのみ。</p>
     </div>
     <div class="inline">
-      <label for="userid">ID</label>
-      <input type="text" name="login_id" value="">
+      <label for="userid">ログインID</label>
+      <input type="text" name="login_id" value="{{login_id}}" disabled="disabled">
     </div>
     <div class="inline">
-      <label for="password">password</label>
+      <label for="password">新しいパスワード</label>
       <input type="password" name="password" value="">
     </div>
+    {% if error_pw %}
+    <div class="error">
+      <p>パスワードが一致していません。</p>
+    </div>
+    {% endif %}
     <div class="inline">
-      <label for="password">password確認</label>
+      <label for="password">パスワード確認</label>
       <input type="password" name="conf_password" value="">
     </div>
     <div class="inline">
-      <label for="password">お名前</label>
+      <label for="username">ユーザーネーム</label>
       <input type="text" name="username" value="">
     </div>
+    {% if error_un %}
+    <div class="error">
+      <p>すでに使われています。</p>
+    </div>
+    {% endif %}
     <div class="inline">
-      <label for="password">ひと言</label>
+      <label for="profile">自己紹介</label>
       <textarea type="text" name="profile" value=""></textarea>
     </div>
     <input class="button" type="submit" name="submit" value="登録">
