@@ -277,10 +277,18 @@ def signup():
     password      =      request.form['password']
     conf_password = request.form['conf_password']
     username      =      request.form['username']
+
+    # Check existence of login_id.
+    if isexist_db('login_id',login_id):
+        return render_template( 'signup.html', error_id=True, message='すでに使われています。' )
+
+    # Check existence of username.
+    if isexist_db('username',username):
+        return render_template( 'signup.html', error_un=True, message='すでに使われています。' )
     
     # Collate password.
     if password != conf_password:
-        return render_template( 'error.html', message='パスワードが一致していません。' )
+        return render_template( 'signup.html', error_pw=True, message='パスワードが一致していません。' )
 
     # Connect to database.
     conn, curs = connect_db()
@@ -322,6 +330,11 @@ def signin():
     # Get login user's value from web form.
     login_id = request.form['login_id']
     in_pw    = request.form['password']
+
+    # Check existence of login_id.
+    if not isexist_db( 'login_id', login_id ):
+        # Show error page.
+        return render_template( 'signin.html', error_id=True )
     
     # Connect to database.
     conn, curs = connect_db()
@@ -334,9 +347,8 @@ def signin():
     # Disconnect form database.
     conn.close()
     curs.close()
-    
-    # [Not equiped] If login_id is not found, show error page.
-    
+
+    # Check password.
     user_id  = result[0][0]
     username = result[0][1]
     corr_pw  = result[0][2]
@@ -351,7 +363,7 @@ def signin():
         return resp
 
     else:
-        return render_template( 'error.html', message='パスワードが間違っています。' )
+        return render_template( 'signin.html', error_pw=True )
 
 # Process sign out.
 @application.route('/signout')
@@ -384,31 +396,32 @@ def signout():
     return resp
 
 # Edit profile.
-@application.route('/profile_edit', methods=['GET', 'POST'])
+@application.route('/profile_edit', methods=['GET','POST'])
 def prof_edit():
 
     global url_base, upload_folder
+
+    login_id = request.cookies.get('login_id')
     
     if request.method == 'GET':
         # Show profile edit page.
-        return render_template( 'profile_edit.html' )
+        return render_template( 'profile_edit.html', login_id=login_id )
     
     user_id  = session['user_id']
     
     # Get new user's value from web form.
-    login_id = request.form['login_id']
     new_pw1  = request.form['password']
     new_pw2  = request.form['conf_password']
     username = request.form['username']
     profile  = request.form['profile']
     img_file = request.files['img_file']
-    
-    if login_id:
-        return render_template( 'error.html', message='login_id は変更できません。' )
-    
+        
     if new_pw1 != new_pw2:
-        return render_template( 'error.html', message='パスワードが一致していません。' )
+        return render_template( 'profile_edit.html', error_pw=True )
 
+    if isexist_db('username',username):
+        return render_template( 'profile_edit.html', error_un=True )
+    
     # Connect database.
     conn, curs = connect_db()
 
