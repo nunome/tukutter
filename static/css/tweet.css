@@ -52,7 +52,7 @@
 }
 #tweet .tweet form.tweet-form {
     color: #707070;
-    display: flex;
+    display: inline;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -62,7 +62,17 @@
     height: 11vw;
     font-size: 2vw;
 }
-#tweet .tweet form.tweet-form input[type="submit"] {
+#tweet .tweet form.tweet-form button.button-save {
+    margin-left: 40%;
+    margin-top: 1vw;
+    border: none;
+    font-size: 1.5vw;
+    padding: 0.2vw 0.9vw;
+    border-radius: 0;
+    background-color: #B9DCF2;
+    color: #707070;
+}
+#tweet .tweet form.tweet-form button.button-delete {
     margin-top: 1vw;
     border: none;
     font-size: 1.5vw;
