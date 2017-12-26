@@ -40,14 +40,16 @@
     <div class="profile-content">
       <p>{{disp_user[0][2]}}</p>
     </div>
+    {% if   follows[0][0] == '2' %}
+    {% elif follows[0][0] == '1' %}
     <div class="follow">
-      {% if   follows[0][0] == '2' %}
-      {% elif follows[0][0] == '1' %}
       <a href="/follow/{{disp_user[0][3]}}"><span>フォロー中</span></a>
-      {% else %}
-      <a href="/follow/{{disp_user[0][3]}}"><span>フォローする</span></a>
-      {% endif %}
     </div>
+    {% else %}
+    <div class="follow">
+      <a href="/follow/{{disp_user[0][3]}}"><span>フォローする</span></a>
+    </div>
+    {% endif %}
   </div>
 
   <div class="stream">
