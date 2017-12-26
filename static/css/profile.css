@@ -61,7 +61,7 @@
     display: inline-block;
 }
 #profile .profilecard .profile-header p span.user-name {
-    margin-top: 7vw;
+    margin-top: 3vw;
     margin-left: 1vw;
     font-size: 5vw;
     word-break: break-all;
@@ -83,6 +83,12 @@
 }
 #profile .profilecard.fixed {
     margin-top: 80px;
+}
+#profile .profilecard .follow {
+    margin-left: 78%;
+    padding: 0.3vw;
+    font-size: 1.5vw;
+    background-color: #B9DCF2;
 }
 #profile .stream {
     width: 38vw;
